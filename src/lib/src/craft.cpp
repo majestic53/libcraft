@@ -27,6 +27,7 @@ namespace CRAFT {
 	_craft::_craft(void) :
 		m_initialized(false),
 		m_initialized_external(false),
+		m_instance_display(craft_display::acquire()),
 		m_running(false)
 	{
 		std::atexit(craft::_delete);
@@ -92,6 +93,8 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STARTED);
 		}
 
+		m_instance_display->initialize();
+
 		// TODO: initialize child components
 
 		m_initialized = true;
@@ -146,6 +149,9 @@ namespace CRAFT {
 					case SDL_QUIT:
 						stop();
 						break;
+					case SDL_WINDOWEVENT:
+						m_instance_display->on_event(event.window);
+						break;
 
 					// TODO: handle input events
 				}
@@ -173,6 +179,8 @@ namespace CRAFT {
 		}
 
 		setup_external();
+		m_instance_display->start(WINDOW_TITLE, WINDOW_LEFT, WINDOW_TOP, 
+			WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_FLAGS);
 
 		// TODO: setup child components
 	}
@@ -193,18 +201,17 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_EXTERNAL_INITIALIZED);
 		}
 
+		m_initialized_external = true;
+
 		if(SDL_Init(SDL_INIT_EVERYTHING)) {
 			THROW_CRAFT_EXCEPTION_FORMAT(CRAFT_EXCEPTION_EXTERNAL,
 				"%s", SDL_GetError());
 		}
 
 		if(!glfwInit()) {
-			SDL_Quit();
 			THROW_CRAFT_EXCEPTION_FORMAT(CRAFT_EXCEPTION_EXTERNAL,
 				"%s", "glfwInit failed");
 		}
-
-		m_initialized_external = true;
 	}
 
 	void 
@@ -251,6 +258,7 @@ namespace CRAFT {
 
 		// TODO: teardown child components
 
+		m_instance_display->stop();
 		teardown_external();
 	}
 
@@ -292,6 +300,7 @@ namespace CRAFT {
 		result << ")";
 
 		if(m_initialized) {
+			result << std::endl << m_instance_display->to_string(verbose);
 
 			// TODO: print child components
 
@@ -318,6 +327,7 @@ namespace CRAFT {
 
 		// TODO: uninitialize child components
 
+		m_instance_display->uninitialize();
 		clear();
 		m_initialized = false;
 	}

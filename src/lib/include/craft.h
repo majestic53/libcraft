@@ -20,6 +20,7 @@
 #ifndef CRAFT_H_
 #define CRAFT_H_
 
+#include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
@@ -33,8 +34,17 @@
 
 #include "craft_define.h"
 #include "craft_exception.h"
+#include "craft_gl.h"
 
 using namespace CRAFT;
+
+#ifndef COMPONENT
+#define COMPONENT component
+#endif // COMPONENT
+
+#include "craft_display.h"
+
+using namespace CRAFT::COMPONENT;
 
 namespace CRAFT {
 
@@ -103,6 +113,8 @@ namespace CRAFT {
 			bool m_initialized_external;
 
 			static _craft *m_instance;
+
+			craft_display *m_instance_display;
 
 			bool m_running;
 

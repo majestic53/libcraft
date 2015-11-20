@@ -61,7 +61,7 @@ namespace CRAFT {
 
 	#define SCALAR_AS_HEX(_TYPE_, _VAL_) \
 		std::setw(sizeof(_TYPE_) * 2) << std::setfill('0') << std::hex \
-		<< (uintmax_t) ((_TYPE_) (_VAL_)) << std::dec;
+		<< (uintmax_t) ((_TYPE_) (_VAL_)) << std::dec
 
 	#define STRING_CHECK(_STR_) (_STR_.empty() ? STRING_EMPTY : _STR_.c_str())
 
@@ -73,7 +73,7 @@ namespace CRAFT {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 1
+	#define VERSION_REVISION 2
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) \
 		"." STRING_CONCAT(VERSION_TICK) "." STRING_CONCAT(VERSION_REVISION)

@@ -13,6 +13,11 @@ Changelog
 =========
 
 ##Version 0.1.1547
+*Updated:11/19/2015*
+
+* Added display singleton class
+* Added gl singleton class (partial)
+
 *Updated:11/18/2015*
 
 * Initial commit
