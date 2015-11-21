@@ -30,6 +30,6 @@ all: exe
 exe:
 	@echo ''
 	@echo '--- BUILDING EXE ---------------------------' 
-	$(CC) $(CC_FLAGS) $(CC_FLAGS_GL) main.cpp $(DIR_BUILD)$(LIB) -o $(DIR_BIN)$(EXE)
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_GL) main.cpp $(DIR_BIN)$(LIB) -o $(DIR_BIN)$(EXE)
 	@echo '--- DONE -----------------------------------'
 	@echo ''

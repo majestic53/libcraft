@@ -24,7 +24,57 @@ namespace CRAFT {
 
 	namespace COMPONENT {
 
-		// TODO
+		typedef class _craft_mouse {
+
+			public:
+
+				~_craft_mouse(void);
+
+				static _craft_mouse *acquire(void);
+
+				void initialize(void);
+
+				static bool is_allocated(void);
+
+				bool is_initialized(void);
+
+				void on_event(
+					__in const SDL_MouseButtonEvent &event
+					);
+
+				void on_event(
+					__in const SDL_MouseMotionEvent &event
+					);
+
+				void on_event(
+					__in const SDL_MouseWheelEvent &event
+					);
+
+				std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+				void uninitialize(void);
+
+			protected:
+
+				_craft_mouse(void);
+
+				_craft_mouse(
+					__in const _craft_mouse &other
+					);
+
+				_craft_mouse &operator=(
+					__in const _craft_mouse &other
+					);
+
+				static void _delete(void);
+
+				bool m_initialized;
+
+				static _craft_mouse *m_instance;
+
+		} craft_mouse;
 	}
 }
 

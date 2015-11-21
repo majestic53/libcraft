@@ -24,7 +24,49 @@ namespace CRAFT {
 
 	namespace COMPONENT {
 
-		// TODO
+		typedef class _craft_keyboard {
+
+			public:
+
+				~_craft_keyboard(void);
+
+				static _craft_keyboard *acquire(void);
+
+				void initialize(void);
+
+				static bool is_allocated(void);
+
+				bool is_initialized(void);
+
+				void on_event(
+					__in const SDL_KeyboardEvent &event
+					);
+
+				std::string to_string(
+					__in_opt bool verbose = false
+					);
+
+				void uninitialize(void);
+
+			protected:
+
+				_craft_keyboard(void);
+
+				_craft_keyboard(
+					__in const _craft_keyboard &other
+					);
+
+				_craft_keyboard &operator=(
+					__in const _craft_keyboard &other
+					);
+
+				static void _delete(void);
+
+				bool m_initialized;
+
+				static _craft_keyboard *m_instance;
+
+		} craft_keyboard;
 	}
 }
 

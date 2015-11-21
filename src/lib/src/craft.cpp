@@ -206,7 +206,7 @@ namespace CRAFT {
 
 		m_initialized_external = true;
 
-		if(SDL_Init(SDL_INIT_EVERYTHING)) {
+		if(SDL_Init(EVENT_FILTER)) {
 			THROW_CRAFT_EXCEPTION_FORMAT(CRAFT_EXCEPTION_EXTERNAL,
 				"%s", SDL_GetError());
 		}

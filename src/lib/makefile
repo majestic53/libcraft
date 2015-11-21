@@ -28,7 +28,7 @@ all: build archive
 archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
-	ar rcs $(DIR_BUILD)$(LIB) $(DIR_BUILD)craft.o $(DIR_BUILD)craft_display.o $(DIR_BUILD)craft_exception.o $(DIR_BUILD)craft_gl.o \
+	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)craft.o $(DIR_BUILD)craft_display.o $(DIR_BUILD)craft_exception.o $(DIR_BUILD)craft_gl.o \
 		$(DIR_BUILD)craft_keyboard.o $(DIR_BUILD)craft_mouse.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
