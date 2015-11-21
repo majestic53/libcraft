@@ -43,6 +43,8 @@ using namespace CRAFT;
 #endif // COMPONENT
 
 #include "craft_display.h"
+#include "craft_keyboard.h"
+#include "craft_mouse.h"
 
 using namespace CRAFT::COMPONENT;
 

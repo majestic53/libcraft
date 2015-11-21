@@ -16,6 +16,7 @@ Changelog
 *Updated:11/20/2015*
 
 * Added gl program/shader/texture support
+* Added keyboard/mouse class files (partial)
 
 *Updated:11/19/2015*
 
