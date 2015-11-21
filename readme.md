@@ -13,6 +13,10 @@ Changelog
 =========
 
 ##Version 0.1.1547
+*Updated:11/20/2015*
+
+* Added gl program/shader/texture support
+
 *Updated:11/19/2015*
 
 * Added display singleton class

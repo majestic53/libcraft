@@ -30,21 +30,118 @@ namespace CRAFT {
 
 			static _craft_gl *acquire(void);
 
+			GLuint add_pogram(
+				__in GLuint fragment,
+				__in GLuint vertex
+				);
+
+			GLuint add_shader(
+				__in const std::string &source,
+				__in GLenum type
+				);
+
+			GLuint add_texture(
+				__in const std::string &path,
+				__in_opt GLint filter = GL_LINEAR,
+				__in_opt GLint wrap = GL_CLAMP_TO_EDGE
+				);
+
+			GLuint add_texture(
+				__in const std::vector<uint8_t> &source,
+				__in GLfloat width,
+				__in GLfloat height,
+				__in_opt GLint format = GL_RGBA,
+				__in_opt GLint filter = GL_LINEAR,
+				__in_opt GLint wrap = GL_CLAMP_TO_EDGE
+				);
+
+			void clear(void);
+
+			bool contains_program(
+				__in GLuint id
+				);
+
+			bool contains_shader(
+				__in GLuint id
+				);
+
+			bool contains_texture(
+				__in GLuint id
+				);
+
+			size_t decrement_program_reference(
+				__in GLuint id
+				);
+
+			size_t decrement_shader_reference(
+				__in GLuint id
+				);
+
+			size_t decrement_texture_reference(
+				__in GLuint id
+				);
+
+			size_t increment_program_reference(
+				__in GLuint id
+				);
+
+			size_t increment_shader_reference(
+				__in GLuint id
+				);
+
+			size_t increment_texture_reference(
+				__in GLuint id
+				);
+
 			void initialize(void);
 
 			static void initialize_external(
-				__in uint32_t accelerate,
-				__in uint32_t depth,
-				__in uint32_t double_buffer,
-				__in uint32_t major,
-				__in uint32_t minor,
-				__in uint32_t swap_interval,
-				__in uint32_t glew_version
+				__in uint32_t version
 				);
 
 			static bool is_allocated(void);
 
 			bool is_initialized(void);
+
+			GLint program_attribute(
+				__in const std::string &name,
+				__in GLuint id
+				);
+
+			size_t program_count(void);
+
+			size_t program_reference(
+				__in GLuint id
+				);
+
+			std::pair<GLuint, GLuint> program_shaders(
+				__in GLuint id
+				);
+
+			GLint program_uniform(
+				__in const std::string &name,
+				__in GLuint id
+				);
+
+			size_t shader_count(void);
+
+			size_t shader_reference(
+				__in GLuint id
+				);
+
+			GLenum shader_type(
+				__in GLuint id
+				);
+
+			size_t texture_count(void);
+
+			std::pair<GLfloat, GLfloat> texture_dimensions(
+				__in GLuint id
+				);
+
+			size_t texture_reference(
+				__in GLuint id
+				);
 
 			std::string to_string(
 				__in_opt bool verbose = false
@@ -66,9 +163,34 @@ namespace CRAFT {
 
 			static void _delete(void);
 
+			static std::vector<uint8_t> bitmap(
+				__in const std::string &path,
+				__out GLint &format,
+				__out GLfloat &width,
+				__out GLfloat &height
+				);
+
+			std::map<GLuint, std::pair<std::pair<GLuint, GLuint>, size_t>>::iterator find_program(
+				__in GLuint id
+				);
+
+			std::map<GLuint, std::pair<GLenum, size_t>>::iterator find_shader(
+				__in GLuint id
+				);
+
+			std::map<GLuint, std::pair<std::pair<std::pair<GLfloat, GLfloat>, GLint>, size_t>>::iterator find_texture(
+				__in GLuint id
+				);
+
 			bool m_initialized;
 
 			static _craft_gl *m_instance;
+
+			std::map<GLuint, std::pair<std::pair<GLuint, GLuint>, size_t>> m_program_map;
+
+			std::map<GLuint, std::pair<GLenum, size_t>> m_shader_map;
+
+			std::map<GLuint, std::pair<std::pair<std::pair<GLfloat, GLfloat>, GLint>, size_t>> m_texture_map;
 
 	} craft_gl;
 }

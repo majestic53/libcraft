@@ -134,7 +134,7 @@ namespace CRAFT {
 			__in const SDL_WindowEvent &event
 			)
 		{
-			// TODO: handle window event
+			return;
 		}
 
 		void 
@@ -147,7 +147,6 @@ namespace CRAFT {
 			__in uint32_t flags
 			)
 		{
-			GLenum error;
 
 			if(!m_initialized) {
 				THROW_CRAFT_DISPLAY_EXCEPTION(CRAFT_DISPLAY_EXCEPTION_UNINITIALIZED);
@@ -174,19 +173,6 @@ namespace CRAFT {
 			SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, DISPLAY_DOUBLE_BUFFER);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, DISPLAY_MAJOR_VERSION);
 			SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, DISPLAY_MINOR_VERSION);
-			glewExperimental = GL_TRUE;
-
-			error = glewInit();
-			if(error != GLEW_OK) {
-				THROW_CRAFT_DISPLAY_EXCEPTION_FORMAT(CRAFT_DISPLAY_EXCEPTION_EXTERNAL,
-					"glewInit failed: %s", glewGetErrorString(error));
-			}
-
-			if(!DISPLAY_GL_VERSION) {
-				THROW_CRAFT_DISPLAY_EXCEPTION_FORMAT(CRAFT_DISPLAY_EXCEPTION_EXTERNAL,
-					"OpenGL version unsupported: %s", glGetString(GL_VERSION));
-			}
-
 			SDL_GL_SetSwapInterval(DISPLAY_SWAP_INTERVAL);
 		}
 

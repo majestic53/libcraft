@@ -116,6 +116,8 @@ namespace CRAFT {
 
 			craft_display *m_instance_display;
 
+			craft_gl *m_instance_gl;
+
 			bool m_running;
 
 	} craft;

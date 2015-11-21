@@ -20,34 +20,29 @@
 #ifndef CRAFT_DEFINE_H_
 #define CRAFT_DEFINE_H_
 
-#include <cstdbool>
-#include <cstddef>
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace CRAFT {
 
-	#ifndef __in
+#ifndef _WIN32
 	#define __in
-	#endif // __in
-	#ifndef __in_opt
 	#define __in_opt
-	#endif // __in_opt
-	#ifndef __inout
 	#define __inout
-	#endif // __inout
-	#ifndef __inout_opt
 	#define __inout_opt
-	#endif // __inout_opt
-	#ifndef __out
 	#define __out
-	#endif // __out
-	#ifndef __out_opt
 	#define __out_opt
-	#endif // __out_opt
+	#define STRUCT_PACK(_NAME_, _STRUCT_) \
+		typedef struct __attribute((packed)) _STRUCT_ _NAME_
+#else
+	#define STRUCT_PACK(_NAME_, _STRUCT_) \
+		__pragma(pack(push, 1)) typedef struct _STRUCT_ _NAME_ __pragma(pack(pop))
+#endif // _WIN32
 
 	#define DISPLAY_ACCELERATE_VISUAL 1
 	#define DISPLAY_DEPTH_SIZE 16
@@ -56,6 +51,10 @@ namespace CRAFT {
 	#define DISPLAY_MINOR_VERSION 2
 	#define DISPLAY_SWAP_INTERVAL 1
 	#define DISPLAY_GL_VERSION GLEW_VERSION_3_2
+
+	#define GL_VERSION_VALID() ((DISPLAY_GL_VERSION) == GL_TRUE)
+
+	#define REFERENCE_INITIAL 1
 
 	#define SCALAR_INVALID(_TYPE_) ((_TYPE_) -1)
 
@@ -73,7 +72,7 @@ namespace CRAFT {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 2
+	#define VERSION_REVISION 3
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) \
 		"." STRING_CONCAT(VERSION_TICK) "." STRING_CONCAT(VERSION_REVISION)

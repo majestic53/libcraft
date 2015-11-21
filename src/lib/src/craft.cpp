@@ -28,6 +28,7 @@ namespace CRAFT {
 		m_initialized(false),
 		m_initialized_external(false),
 		m_instance_display(craft_display::acquire()),
+		m_instance_gl(craft_gl::acquire()),
 		m_running(false)
 	{
 		std::atexit(craft::_delete);
@@ -94,6 +95,7 @@ namespace CRAFT {
 		}
 
 		m_instance_display->initialize();
+		m_instance_gl->initialize();
 
 		// TODO: initialize child components
 
@@ -181,6 +183,7 @@ namespace CRAFT {
 		setup_external();
 		m_instance_display->start(WINDOW_TITLE, WINDOW_LEFT, WINDOW_TOP, 
 			WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_FLAGS);
+		craft_gl::initialize_external(DISPLAY_GL_VERSION);
 
 		// TODO: setup child components
 	}
@@ -299,13 +302,6 @@ namespace CRAFT {
 
 		result << ")";
 
-		if(m_initialized) {
-			result << std::endl << m_instance_display->to_string(verbose);
-
-			// TODO: print child components
-
-		}
-
 		return result.str();
 	}
 
@@ -327,6 +323,7 @@ namespace CRAFT {
 
 		// TODO: uninitialize child components
 
+		m_instance_gl->uninitialize();
 		m_instance_display->uninitialize();
 		clear();
 		m_initialized = false;
