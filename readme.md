@@ -13,6 +13,11 @@ Changelog
 =========
 
 ##Version 0.1.1547
+*Updated:11/21/2015*
+
+* Completed keyboard/mouse classes
+* Added camera class (partial)
+
 *Updated:11/20/2015*
 
 * Added gl program/shader/texture support

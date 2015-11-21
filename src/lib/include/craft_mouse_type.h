@@ -34,16 +34,20 @@ namespace CRAFT {
 
 		enum {
 			CRAFT_MOUSE_EXCEPTION_ALLOCATED = 0,
+			CRAFT_MOUSE_EXCEPTION_EXTERNAL,
 			CRAFT_MOUSE_EXCEPTION_INITIALIZED,
+			CRAFT_MOUSE_EXCEPTION_PARENT,
 			CRAFT_MOUSE_EXCEPTION_UNINITIALIZED,
 		};
 
 		#define CRAFT_MOUSE_EXCEPTION_MAX CRAFT_MOUSE_EXCEPTION_UNINITIALIZED
 
 		static const std::string CRAFT_MOUSE_EXCEPTION_STR[] = {
-			CRAFT_MOUSE_EXCEPTION_HEADER " Failed to allocate MOUSE component",
-			CRAFT_MOUSE_EXCEPTION_HEADER " MOUSE component is initialized",
-			CRAFT_MOUSE_EXCEPTION_HEADER " MOUSE component is uninitialized",
+			CRAFT_MOUSE_EXCEPTION_HEADER " Failed to allocate mouse component",
+			CRAFT_MOUSE_EXCEPTION_HEADER " External exception",
+			CRAFT_MOUSE_EXCEPTION_HEADER " Mouse component is initialized",
+			CRAFT_MOUSE_EXCEPTION_HEADER " Invalid reference to parent object",
+			CRAFT_MOUSE_EXCEPTION_HEADER " Mouse component is uninitialized",
 			};
 
 		#define CRAFT_MOUSE_EXCEPTION_STRING(_TYPE_) \

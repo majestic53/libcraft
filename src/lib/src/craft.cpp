@@ -29,6 +29,8 @@ namespace CRAFT {
 		m_initialized_external(false),
 		m_instance_display(craft_display::acquire()),
 		m_instance_gl(craft_gl::acquire()),
+		m_instance_keyboard(craft_keyboard::acquire()),
+		m_instance_mouse(craft_mouse::acquire()),
 		m_running(false)
 	{
 		std::atexit(craft::_delete);
@@ -79,11 +81,16 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STARTED);
 		}
 
+		m_instance_keyboard->clear();
+		m_instance_mouse->clear();
+
 		// TODO: clear child components
 	}
 
 	void 
-	_craft::initialize(void)
+	_craft::initialize(
+		__in_opt const std::set<SDL_Keycode> &keys
+		)
 	{
 
 		if(m_initialized) {
@@ -95,8 +102,9 @@ namespace CRAFT {
 		}
 
 		m_instance_display->initialize();
+		m_instance_keyboard->initialize(keys);
 		m_instance_gl->initialize();
-
+		
 		// TODO: initialize child components
 
 		m_initialized = true;
@@ -121,9 +129,25 @@ namespace CRAFT {
 	}
 
 	void 
+	_craft::poll_input(void)
+	{
+
+		if(!m_initialized) {
+			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_UNINITIALIZED);
+		}
+
+		if(!m_running) {
+			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STOPPED);
+		}
+
+		m_instance_keyboard->update();
+		m_instance_mouse->update();
+	}
+
+	void 
 	_craft::render(void)
 	{
-		// TODO
+		// TODO: render child components
 	}
 
 	void 
@@ -151,11 +175,23 @@ namespace CRAFT {
 					case SDL_QUIT:
 						stop();
 						break;
+					case SDL_KEYDOWN:
+					case SDL_KEYUP:
+						m_instance_keyboard->on_event(event.key);
+						break;
+					case SDL_MOUSEBUTTONDOWN:
+					case SDL_MOUSEBUTTONUP:
+						m_instance_mouse->on_event(event.button);
+						break;
+					case SDL_MOUSEMOTION:
+						m_instance_mouse->on_event(event.motion);
+						break;
+					case SDL_MOUSEWHEEL:
+						m_instance_mouse->on_event(event.wheel);
+						break;
 					case SDL_WINDOWEVENT:
 						m_instance_display->on_event(event.window);
 						break;
-
-					// TODO: handle input events
 				}
 			}
 
@@ -183,6 +219,8 @@ namespace CRAFT {
 		setup_external();
 		m_instance_display->start(WINDOW_TITLE, WINDOW_LEFT, WINDOW_TOP, 
 			WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_FLAGS);
+		m_instance_keyboard->reset();
+		m_instance_mouse->initialize(m_instance_display->window());
 		craft_gl::initialize_external(DISPLAY_GL_VERSION);
 
 		// TODO: setup child components
@@ -259,6 +297,8 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STARTED);
 		}
 
+		clear();
+
 		// TODO: teardown child components
 
 		m_instance_display->stop();
@@ -321,11 +361,14 @@ namespace CRAFT {
 			teardown_external();
 		}
 
+		clear();
+
 		// TODO: uninitialize child components
 
 		m_instance_gl->uninitialize();
+		m_instance_mouse->uninitialize();
+		m_instance_keyboard->uninitialize();
 		m_instance_display->uninitialize();
-		clear();
 		m_initialized = false;
 	}
 
@@ -334,7 +377,7 @@ namespace CRAFT {
 		__in GLfloat delta
 		)
 	{
-		// TODO
+		// TODO: update child components
 	}
 
 	std::string 

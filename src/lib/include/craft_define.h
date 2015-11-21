@@ -24,9 +24,15 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <GLFW/glfw3.h>
+#include <SDL2/SDL.h>
 
 namespace CRAFT {
 
@@ -52,10 +58,18 @@ namespace CRAFT {
 	#define DISPLAY_SWAP_INTERVAL 1
 	#define DISPLAY_GL_VERSION GLEW_VERSION_3_2
 
+	#define EVENT_DOUBLE_CLICK 2
 	#define EVENT_FILTER \
 		(SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_TIMER | SDL_INIT_VIDEO)
 
 	#define GL_VERSION_VALID() ((DISPLAY_GL_VERSION) == GL_TRUE)
+
+	#define KEY_AS_STRING(_KEY_) \
+		SDL_GetScancodeName(SDL_GetScancodeFromKey(_KEY_))
+
+	#define MOUSE_DEFAULT_RELATIVE true
+	#define MOUSE_DEFAULT_X 0
+	#define MOUSE_DEFAULT_Y 0
 
 	#define REFERENCE_INITIAL 1
 
@@ -75,7 +89,7 @@ namespace CRAFT {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 4
+	#define VERSION_REVISION 5
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) \
 		"." STRING_CONCAT(VERSION_TICK) "." STRING_CONCAT(VERSION_REVISION)

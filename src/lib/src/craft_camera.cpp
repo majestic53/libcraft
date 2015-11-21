@@ -17,32 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../lib/include/craft.h"
+#include "../include/craft.h"
+#include "../include/craft_camera_type.h"
 
-int 
-main(void) 
-{
-	int result = 0;
-	craft *instance = NULL;
-	std::set<SDL_Keycode> keys = { SDLK_a, SDLK_d, SDLK_s, SDLK_w, };
+namespace CRAFT {
 
-	std::cout << craft::version() << std::endl;
+	namespace COMPONENT {
 
-	try {
-		instance = craft::acquire();
-		instance->initialize(keys);
-		instance->start();
-		instance->uninitialize();
-	} catch(craft_exception &exc) {
-		std::cerr << exc.to_string(true) << std::endl;
-		result = SCALAR_INVALID(int);
-		goto exit;
-	} catch(std::runtime_error &exc) {
-		std::cerr << exc.what() << std::endl;
-		result = SCALAR_INVALID(int);
-		goto exit;
+		// TODO
 	}
-
-exit:
-	return result;
 }

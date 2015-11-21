@@ -20,12 +20,6 @@
 #ifndef CRAFT_H_
 #define CRAFT_H_
 
-#include <GL/glew.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <GLFW/glfw3.h>
-#include <SDL2/SDL.h>
-
 //#define NDEBUG
 
 #ifndef CRAFT
@@ -45,6 +39,7 @@ using namespace CRAFT;
 #include "craft_display.h"
 #include "craft_keyboard.h"
 #include "craft_mouse.h"
+#include "craft_camera.h"
 
 using namespace CRAFT::COMPONENT;
 
@@ -58,13 +53,17 @@ namespace CRAFT {
 
 			static _craft *acquire(void);
 
-			void initialize(void);
+			void initialize(
+				__in_opt const std::set<SDL_Keycode> &keys = std::set<SDL_Keycode>()
+				);
 
 			static bool is_allocated(void);
 
 			bool is_initialized(void);
 
 			bool is_running(void);
+
+			void poll_input(void);
 
 			void start(void);
 
@@ -119,6 +118,10 @@ namespace CRAFT {
 			craft_display *m_instance_display;
 
 			craft_gl *m_instance_gl;
+
+			craft_keyboard *m_instance_keyboard;
+
+			craft_mouse *m_instance_mouse;
 
 			bool m_running;
 

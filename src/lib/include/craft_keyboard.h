@@ -32,21 +32,47 @@ namespace CRAFT {
 
 				static _craft_keyboard *acquire(void);
 
-				void initialize(void);
+				void add(
+					__in const SDL_Keycode &id
+					);
+
+				void clear(void);
+
+				bool contains(
+					__in const SDL_Keycode &id
+					);
+
+				void initialize(
+					__in_opt const std::set<SDL_Keycode> &ids = std::set<SDL_Keycode>()
+					);
 
 				static bool is_allocated(void);
 
 				bool is_initialized(void);
 
+				bool is_pressed(
+					__in const SDL_Keycode &id
+					);
+
 				void on_event(
 					__in const SDL_KeyboardEvent &event
 					);
+
+				void remove(
+					__in const SDL_Keycode &id
+					);
+
+				void reset(void);
+
+				size_t size(void);
 
 				std::string to_string(
 					__in_opt bool verbose = false
 					);
 
 				void uninitialize(void);
+
+				void update(void);
 
 			protected:
 
@@ -62,9 +88,15 @@ namespace CRAFT {
 
 				static void _delete(void);
 
+				std::map<SDL_Keycode, bool>::iterator find(
+					__in const SDL_Keycode &id
+					);
+
 				bool m_initialized;
 
 				static _craft_keyboard *m_instance;
+
+				std::map<SDL_Keycode, bool> m_key_map;
 
 		} craft_keyboard;
 	}

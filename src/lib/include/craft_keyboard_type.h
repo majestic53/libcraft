@@ -33,7 +33,9 @@ namespace CRAFT {
 
 		enum {
 			CRAFT_KEYBOARD_EXCEPTION_ALLOCATED = 0,
+			CRAFT_KEYBOARD_EXCEPTION_EXTERNAL,
 			CRAFT_KEYBOARD_EXCEPTION_INITIALIZED,
+			CRAFT_KEYBOARD_EXCEPTION_NOT_FOUND,
 			CRAFT_KEYBOARD_EXCEPTION_UNINITIALIZED,
 		};
 
@@ -41,7 +43,9 @@ namespace CRAFT {
 
 		static const std::string CRAFT_KEYBOARD_EXCEPTION_STR[] = {
 			CRAFT_KEYBOARD_EXCEPTION_HEADER " Failed to allocate keyboard component",
+			CRAFT_KEYBOARD_EXCEPTION_HEADER " External exception",
 			CRAFT_KEYBOARD_EXCEPTION_HEADER " Keyboard component is initialized",
+			CRAFT_KEYBOARD_EXCEPTION_HEADER " Key does not exist",
 			CRAFT_KEYBOARD_EXCEPTION_HEADER " Keyboard component is uninitialized",
 			};
 
