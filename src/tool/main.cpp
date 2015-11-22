@@ -24,14 +24,13 @@ main(void)
 {
 	int result = 0;
 	craft *instance = NULL;
-	std::set<SDL_Keycode> keys = { SDLK_a, SDLK_d, SDLK_s, SDLK_w, };
 
 	std::cout << craft::version() << std::endl;
 
 	try {
 		instance = craft::acquire();
-		instance->initialize(keys);
-		instance->start();
+		instance->initialize();
+		instance->start(true, 345, 782);
 		instance->uninitialize();
 	} catch(craft_exception &exc) {
 		std::cerr << exc.to_string(true) << std::endl;

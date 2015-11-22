@@ -156,6 +156,8 @@ namespace CRAFT {
 				THROW_CRAFT_DISPLAY_EXCEPTION(CRAFT_DISPLAY_EXCEPTION_STOPPED);
 			}
 
+			validate_dimensions(width, height);
+
 			m_window = SDL_CreateWindow(title.c_str(), left, top, width, height, flags);
 			if(!m_window) {
 				THROW_CRAFT_DISPLAY_EXCEPTION_FORMAT(CRAFT_DISPLAY_EXCEPTION_EXTERNAL,
@@ -276,6 +278,110 @@ namespace CRAFT {
 
 			clear();
 			m_initialized = false;
+		}
+
+		std::map<int, std::vector<std::pair<int, int>>> 
+		_craft_display::supported_resolutions(void)
+		{
+			SDL_DisplayMode mode;
+			std::vector<std::pair<int, int>> modes;
+			int disp_count, disp_iter = 0, mode_count, mode_iter;
+			std::map<int, std::vector<std::pair<int, int>>> result;
+
+			disp_count = SDL_GetNumVideoDisplays();
+			if(!disp_count) {
+				THROW_CRAFT_DISPLAY_EXCEPTION(CRAFT_DISPLAY_EXCEPTION_MISSING);
+			} else if(disp_count < 0) {
+				THROW_CRAFT_DISPLAY_EXCEPTION_FORMAT(CRAFT_DISPLAY_EXCEPTION_EXTERNAL,
+					"SDL_GetNumVideoDisplays failed: %s", SDL_GetError());
+			}
+
+			for(; disp_iter < disp_count; ++disp_iter) {
+
+				mode_count = SDL_GetNumDisplayModes(disp_iter);
+				if(!mode_count) {
+					THROW_CRAFT_DISPLAY_EXCEPTION_FORMAT(CRAFT_DISPLAY_EXCEPTION_MISSING_MODE, 
+						"%lu", disp_iter);
+				} else if(mode_count < 0) {
+					THROW_CRAFT_DISPLAY_EXCEPTION_FORMAT(CRAFT_DISPLAY_EXCEPTION_EXTERNAL,
+						"SDL_GetNumDisplayModes failed: %s", SDL_GetError());
+				}
+
+				modes.clear();
+
+				for(mode_iter = 0; mode_iter < mode_count; ++mode_iter) {
+
+					if(SDL_GetDisplayMode(disp_iter, mode_iter, &mode)) {
+						THROW_CRAFT_DISPLAY_EXCEPTION_FORMAT(CRAFT_DISPLAY_EXCEPTION_EXTERNAL,
+							"SDL_GetDisplayMode failed: %s", SDL_GetError());
+					}
+
+					modes.push_back(std::pair<int, int>(mode.w, mode.h));
+				}
+
+				result.insert(std::pair<int, std::vector<std::pair<int, int>>>(disp_iter, modes));
+			}
+
+			return result;
+		}
+
+		void 
+		_craft_display::validate_dimensions(
+			__inout size_t &width,
+			__inout size_t &height
+			)
+		{			
+			bool approx = false, match = false;
+			std::vector<std::pair<int, int>>::iterator mode_iter;
+			size_t width_new = width, height_new = height;
+			std::map<int, std::vector<std::pair<int, int>>> res_map;
+			std::map<int, std::vector<std::pair<int, int>>>::iterator disp_iter;	
+
+			if(!m_initialized) {
+				THROW_CRAFT_DISPLAY_EXCEPTION(CRAFT_DISPLAY_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(!m_running) {
+				THROW_CRAFT_DISPLAY_EXCEPTION(CRAFT_DISPLAY_EXCEPTION_STOPPED);
+			}
+
+			res_map = craft_display::supported_resolutions();
+			if(!res_map.empty()) {
+
+				for(disp_iter = res_map.begin(); disp_iter != res_map.end();
+						++disp_iter) {
+
+					for(mode_iter = disp_iter->second.begin(); mode_iter != disp_iter->second.end();
+							++mode_iter) {
+
+						if((mode_iter->first == width) && (mode_iter->second == height)) {
+							match = true;
+							break;
+						} else if(((mode_iter->second >= (height - RESOLUTION_BUFFER))
+								&& (mode_iter->second <= (height + RESOLUTION_BUFFER)))
+								|| ((mode_iter->first >= (width - RESOLUTION_BUFFER))
+									&& (mode_iter->first <= (width + RESOLUTION_BUFFER)))) {
+							approx = true;
+							height_new = mode_iter->second;
+							width_new = mode_iter->first;
+						}
+					}
+
+					if(match) {
+						break;
+					}
+				}
+			}
+
+			if(!approx && !match) {
+				height_new = WINDOW_HEIGHT_MIN;
+				width_new = WINDOW_WIDTH_MIN;
+			}
+
+			if(!match) {
+				height = height_new;
+				width = width_new;
+			}
 		}
 
 		SDL_Window *

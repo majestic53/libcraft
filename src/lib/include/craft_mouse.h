@@ -41,10 +41,6 @@ namespace CRAFT {
 
 				static bool is_allocated(void);
 
-				bool is_aux1_click(void);
-
-				bool is_aux2_click(void);
-
 				bool is_double_click(void);
 
 				bool is_initialized(void);

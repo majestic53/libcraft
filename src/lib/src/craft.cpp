@@ -82,15 +82,16 @@ namespace CRAFT {
 		}
 
 		m_instance_keyboard->clear();
-		m_instance_mouse->clear();
+
+		if(m_instance_mouse->is_initialized()) {
+			m_instance_mouse->clear();
+		}
 
 		// TODO: clear child components
 	}
 
 	void 
-	_craft::initialize(
-		__in_opt const std::set<SDL_Keycode> &keys
-		)
+	_craft::initialize(void)
 	{
 
 		if(m_initialized) {
@@ -102,7 +103,7 @@ namespace CRAFT {
 		}
 
 		m_instance_display->initialize();
-		m_instance_keyboard->initialize(keys);
+		m_instance_keyboard->initialize(CRAFT_KEYS);
 		m_instance_gl->initialize();
 		
 		// TODO: initialize child components
@@ -151,7 +152,11 @@ namespace CRAFT {
 	}
 
 	void 
-	_craft::run(void)
+	_craft::run(
+		__in bool fullscreen,
+		__in_opt size_t width,
+		__in_opt size_t height
+		)
 	{
 		SDL_Event event;
 		GLfloat current = 0.f, last = 0.f;
@@ -164,7 +169,7 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STARTED);
 		}
 
-		setup();
+		setup(fullscreen, width, height);
 		m_running = true;
 
 		while(m_running) {
@@ -205,8 +210,13 @@ namespace CRAFT {
 	}
 
 	void 
-	_craft::setup(void)
+	_craft::setup(
+		__in bool fullscreen,
+		__in_opt size_t width,
+		__in_opt size_t height
+		)
 	{
+		uint32_t flags = WINDOW_FLAGS;
 
 		if(!m_initialized) {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_UNINITIALIZED);
@@ -216,9 +226,13 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STARTED);
 		}
 
+		if(fullscreen) {
+			flags |= SDL_WINDOW_FULLSCREEN;
+		}
+
 		setup_external();
 		m_instance_display->start(WINDOW_TITLE, WINDOW_LEFT, WINDOW_TOP, 
-			WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_FLAGS);
+			width, height, flags);
 		m_instance_keyboard->reset();
 		m_instance_mouse->initialize(m_instance_display->window());
 		craft_gl::initialize_external(DISPLAY_GL_VERSION);
@@ -256,7 +270,11 @@ namespace CRAFT {
 	}
 
 	void 
-	_craft::start(void)
+	_craft::start(
+		__in bool fullscreen,
+		__in_opt size_t width,
+		__in_opt size_t height
+		)
 	{
 
 		if(!m_initialized) {
@@ -267,7 +285,7 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STARTED);
 		}
 
-		run();
+		run(fullscreen, width, height);
 	}
 
 	void 
@@ -298,6 +316,10 @@ namespace CRAFT {
 		}
 
 		clear();
+
+		if(m_instance_mouse->is_initialized()) {
+			m_instance_mouse->uninitialize();
+		}
 
 		// TODO: teardown child components
 
@@ -366,7 +388,6 @@ namespace CRAFT {
 		// TODO: uninitialize child components
 
 		m_instance_gl->uninitialize();
-		m_instance_mouse->uninitialize();
 		m_instance_keyboard->uninitialize();
 		m_instance_display->uninitialize();
 		m_initialized = false;

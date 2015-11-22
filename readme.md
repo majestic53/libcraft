@@ -15,6 +15,7 @@ Changelog
 ##Version 0.1.1547
 *Updated:11/21/2015*
 
+* Added routines to auto-detect resolution
 * Completed keyboard/mouse classes
 * Added camera class (partial)
 

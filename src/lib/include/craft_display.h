@@ -90,7 +90,14 @@ namespace CRAFT {
 					__in uint32_t flags
 					);
 
+				static std::map<int, std::vector<std::pair<int, int>>> supported_resolutions(void);
+
 				void teardown(void);
+
+				void validate_dimensions(
+					__inout size_t &width,
+					__inout size_t &height
+					);
 
 				SDL_GLContext m_context;
 

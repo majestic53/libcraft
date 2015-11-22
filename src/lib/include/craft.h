@@ -53,9 +53,7 @@ namespace CRAFT {
 
 			static _craft *acquire(void);
 
-			void initialize(
-				__in_opt const std::set<SDL_Keycode> &keys = std::set<SDL_Keycode>()
-				);
+			void initialize(void);
 
 			static bool is_allocated(void);
 
@@ -65,7 +63,11 @@ namespace CRAFT {
 
 			void poll_input(void);
 
-			void start(void);
+			void start(
+				__in bool fullscreen,
+				__in_opt size_t width = WINDOW_WIDTH_MIN,
+				__in_opt size_t height = WINDOW_HEIGHT_MIN
+				);
 
 			void stop(void);
 
@@ -95,9 +97,17 @@ namespace CRAFT {
 
 			void render(void);
 
-			void run(void);
+			void run(
+				__in bool fullscreen,
+				__in_opt size_t width = WINDOW_WIDTH_MIN,
+				__in_opt size_t height = WINDOW_HEIGHT_MIN
+				);
 
-			void setup(void);
+			void setup(
+				__in bool fullscreen,
+				__in_opt size_t width = WINDOW_WIDTH_MIN,
+				__in_opt size_t height = WINDOW_HEIGHT_MIN
+				);
 
 			void setup_external(void);
 

@@ -133,36 +133,6 @@ namespace CRAFT {
 		}
 
 		bool 
-		_craft_mouse::is_aux1_click(void)
-		{
-			bool result;
-
-			if(!m_initialized) {
-				THROW_CRAFT_MOUSE_EXCEPTION(CRAFT_MOUSE_EXCEPTION_UNINITIALIZED);
-			}
-
-			result = (m_state & SDL_BUTTON_X1MASK);
-			m_state &= ~SDL_BUTTON_X1MASK;
-
-			return result;
-		}
-
-		bool 
-		_craft_mouse::is_aux2_click(void)
-		{
-			bool result;
-
-			if(!m_initialized) {
-				THROW_CRAFT_MOUSE_EXCEPTION(CRAFT_MOUSE_EXCEPTION_UNINITIALIZED);
-			}
-
-			result = (m_state & SDL_BUTTON_X2MASK);
-			m_state &= ~SDL_BUTTON_X2MASK;
-
-			return result;
-		}
-
-		bool 
 		_craft_mouse::is_double_click(void)
 		{
 			bool result;
@@ -186,31 +156,23 @@ namespace CRAFT {
 		bool 
 		_craft_mouse::is_left_click(void)
 		{
-			bool result;
 
 			if(!m_initialized) {
 				THROW_CRAFT_MOUSE_EXCEPTION(CRAFT_MOUSE_EXCEPTION_UNINITIALIZED);
 			}
 
-			result = (m_state & SDL_BUTTON_LMASK);
-			m_state &= ~SDL_BUTTON_LMASK;
-
-			return result;
+			return (m_state & SDL_BUTTON_LMASK);
 		}
 
 		bool 
 		_craft_mouse::is_middle_click(void)
 		{
-			bool result;
 
 			if(!m_initialized) {
 				THROW_CRAFT_MOUSE_EXCEPTION(CRAFT_MOUSE_EXCEPTION_UNINITIALIZED);
 			}
 
-			result = (m_state & SDL_BUTTON_MMASK);
-			m_state &= ~SDL_BUTTON_MMASK;
-
-			return result;
+			return (m_state & SDL_BUTTON_MMASK);
 		}
 
 		bool 
@@ -227,16 +189,12 @@ namespace CRAFT {
 		bool 
 		_craft_mouse::is_right_click(void)
 		{
-			bool result;
 
 			if(!m_initialized) {
 				THROW_CRAFT_MOUSE_EXCEPTION(CRAFT_MOUSE_EXCEPTION_UNINITIALIZED);
 			}
 
-			result = (m_state & SDL_BUTTON_RMASK);
-			m_state &= ~SDL_BUTTON_RMASK;
-
-			return result;
+			return (m_state & SDL_BUTTON_RMASK);
 		}
 
 		bool 
