@@ -56,6 +56,8 @@ namespace CRAFT {
 					__in const SDL_MouseWheelEvent &event
 					);
 
+				void render(void);
+
 				void reset(void);
 
 				void uninitialize(void);
