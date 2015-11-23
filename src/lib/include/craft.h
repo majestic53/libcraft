@@ -40,6 +40,7 @@ using namespace CRAFT;
 #include "craft_keyboard.h"
 #include "craft_mouse.h"
 #include "craft_camera.h"
+#include "craft_world.h"
 
 using namespace CRAFT::COMPONENT;
 
@@ -124,6 +125,8 @@ namespace CRAFT {
 			bool m_initialized_external;
 
 			static _craft *m_instance;
+
+			craft_camera *m_instance_camera;
 
 			craft_display *m_instance_display;
 

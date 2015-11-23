@@ -182,22 +182,10 @@ namespace CRAFT {
 			__in const SDL_KeyboardEvent &event
 			)
 		{
-			SDL_Keycode key;
 
-			// TODO: debug
-			if(event.keysym.sym == SDLK_ESCAPE) {
-				craft::acquire()->stop();
-			} else {
-			// ---
-
-			key = event.keysym.sym;
-			if(contains(key)) {
-				find(key)->second = (event.state == SDL_PRESSED);
+			if(contains(event.keysym.sym)) {
+				find(event.keysym.sym)->second = (event.state == SDL_PRESSED);
 			}
-
-			// TODO: debug
-			}
-			// ---
 		}
 
 		void 

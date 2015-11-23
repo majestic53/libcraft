@@ -156,7 +156,9 @@ namespace CRAFT {
 				THROW_CRAFT_DISPLAY_EXCEPTION(CRAFT_DISPLAY_EXCEPTION_STOPPED);
 			}
 
-			validate_dimensions(width, height);
+			if(flags & SDL_WINDOW_FULLSCREEN) {
+				validate_dimensions(width, height);
+			}
 
 			m_window = SDL_CreateWindow(title.c_str(), left, top, width, height, flags);
 			if(!m_window) {

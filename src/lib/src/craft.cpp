@@ -27,6 +27,7 @@ namespace CRAFT {
 	_craft::_craft(void) :
 		m_initialized(false),
 		m_initialized_external(false),
+		m_instance_camera(craft_camera::acquire()),
 		m_instance_display(craft_display::acquire()),
 		m_instance_gl(craft_gl::acquire()),
 		m_instance_keyboard(craft_keyboard::acquire()),
@@ -87,6 +88,10 @@ namespace CRAFT {
 			m_instance_mouse->clear();
 		}
 
+		if(m_instance_camera->is_initialized()) {
+			m_instance_camera->clear();
+		}
+
 		// TODO: clear child components
 	}
 
@@ -103,7 +108,7 @@ namespace CRAFT {
 		}
 
 		m_instance_display->initialize();
-		m_instance_keyboard->initialize(CRAFT_KEYS);
+		m_instance_keyboard->initialize(KEYS);
 		m_instance_gl->initialize();
 		
 		// TODO: initialize child components
@@ -233,6 +238,7 @@ namespace CRAFT {
 		setup_external();
 		m_instance_display->start(WINDOW_TITLE, WINDOW_LEFT, WINDOW_TOP, 
 			width, height, flags);
+		m_instance_camera->initialize({width, height});
 		m_instance_keyboard->reset();
 		m_instance_mouse->initialize(m_instance_display->window());
 		craft_gl::initialize_external(DISPLAY_GL_VERSION);
@@ -319,6 +325,10 @@ namespace CRAFT {
 
 		if(m_instance_mouse->is_initialized()) {
 			m_instance_mouse->uninitialize();
+		}
+
+		if(m_instance_camera->is_initialized()) {
+			m_instance_camera->uninitialize();
 		}
 
 		// TODO: teardown child components

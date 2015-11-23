@@ -13,6 +13,11 @@ Changelog
 =========
 
 ##Version 0.1.1547
+*Updated:11/22/2015*
+
+* Added camera class
+* Added world (player) class (partial)
+
 *Updated:11/21/2015*
 
 * Added routines to auto-detect resolution

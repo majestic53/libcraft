@@ -31,6 +31,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
 #include <SDL2/SDL.h>
 
@@ -50,6 +51,17 @@ namespace CRAFT {
 		__pragma(pack(push, 1)) typedef struct _STRUCT_ _NAME_ __pragma(pack(pop))
 #endif // _WIN32
 
+	#define CAMERA_FOV 45.f
+	#define CAMERA_HEIGHT 1.5f
+	#define CAMERA_PITCH 0.f
+	#define CAMERA_PITCH_MAX 89.f
+	#define CAMERA_POSITION {0.f, CAMERA_HEIGHT, 0.f}
+	#define CAMERA_SENSITIVITY 1.f
+	#define CAMERA_SPEED 3.f
+	#define CAMERA_TARGET {0.f, 0.f, 0.f}
+	#define CAMERA_UP {0.f, 1.f, 0.f}
+	#define CAMERA_YAW 0.f
+
 	#define DISPLAY_ACCELERATE_VISUAL 1
 	#define DISPLAY_DEPTH_SIZE 16
 	#define DISPLAY_DOUBLE_BUFFER 1
@@ -66,6 +78,10 @@ namespace CRAFT {
 
 	#define KEY_AS_STRING(_KEY_) \
 		SDL_GetScancodeName(SDL_GetScancodeFromKey(_KEY_))
+	#define KEYS { SDLK_a, SDLK_d, SDLK_s, SDLK_w, }
+
+	#define MAT_INITIAL glm::make_mat4(MAT_EMPTY)
+	#define MAT_UNIT 1.f
 
 	#define MOUSE_DEFAULT_RELATIVE true
 	#define MOUSE_DEFAULT_X 0
@@ -91,7 +107,7 @@ namespace CRAFT {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 5
+	#define VERSION_REVISION 6
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) \
 		"." STRING_CONCAT(VERSION_TICK) "." STRING_CONCAT(VERSION_REVISION)
@@ -104,7 +120,12 @@ namespace CRAFT {
 	#define WINDOW_TOP SDL_WINDOWPOS_CENTERED
 	#define WINDOW_WIDTH_MIN 640
 
-	static std::set<SDL_Keycode> CRAFT_KEYS = { SDLK_a, SDLK_d, SDLK_s, SDLK_w, };
+	static const float MAT_EMPTY[] = {
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		0.f, 0.f, 0.f, 0.f,
+		};
 }
 
 #endif // CRAFT_DEFINE_H_
