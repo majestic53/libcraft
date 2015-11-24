@@ -12,6 +12,11 @@ Table of Contents
 Changelog
 =========
 
+##Version 0.1.1548
+*Updated:11/23/2015*
+
+* Added world class
+
 ##Version 0.1.1547
 *Updated:11/22/2015*
 

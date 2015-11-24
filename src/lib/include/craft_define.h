@@ -78,7 +78,6 @@ namespace CRAFT {
 
 	#define KEY_AS_STRING(_KEY_) \
 		SDL_GetScancodeName(SDL_GetScancodeFromKey(_KEY_))
-	#define KEYS { SDLK_a, SDLK_d, SDLK_s, SDLK_w, }
 
 	#define MAT_INITIAL glm::make_mat4(MAT_EMPTY)
 	#define MAT_UNIT 1.f
@@ -107,11 +106,11 @@ namespace CRAFT {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 6
+	#define VERSION_REVISION 1
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) \
 		"." STRING_CONCAT(VERSION_TICK) "." STRING_CONCAT(VERSION_REVISION)
-	#define VERSION_TICK 1547
+	#define VERSION_TICK 1548
 
 	#define WINDOW_FLAGS (SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN)// | SDL_WINDOW_INPUT_GRABBED)
 	#define WINDOW_HEIGHT_MIN 480
@@ -119,6 +118,27 @@ namespace CRAFT {
 	#define WINDOW_TITLE "LIBCRAFT -- " VERSION_STRING
 	#define WINDOW_TOP SDL_WINDOWPOS_CENTERED
 	#define WINDOW_WIDTH_MIN 640
+
+	enum {
+		KEY_QUIT = 0,
+		KEY_FORWARD,
+		KEY_LEFT,
+		KEY_BACKWARD,
+		KEY_RIGHT,
+	};
+
+	#define KEY_MAX KEY_RIGHT
+
+	static const SDL_Keycode KEYS[] = {
+		SDLK_ESCAPE, SDLK_w, SDLK_a, SDLK_s, SDLK_d,
+		};
+
+	static const std::set<SDL_Keycode> KEY_SET(
+		KEYS, KEYS + (KEY_MAX + 1)
+		);
+
+	#define KEY_CODE(_KEY_) \
+		((_KEY_) > KEY_MAX ? SCALAR_INVALID(SDL_Keycode) : KEYS[_KEY_])
 
 	static const float MAT_EMPTY[] = {
 		0.f, 0.f, 0.f, 0.f,

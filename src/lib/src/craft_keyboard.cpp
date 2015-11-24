@@ -183,6 +183,10 @@ namespace CRAFT {
 			)
 		{
 
+			if(!m_initialized) {
+				THROW_CRAFT_KEYBOARD_EXCEPTION(CRAFT_KEYBOARD_EXCEPTION_UNINITIALIZED);
+			}
+
 			if(contains(event.keysym.sym)) {
 				find(event.keysym.sym)->second = (event.state == SDL_PRESSED);
 			}

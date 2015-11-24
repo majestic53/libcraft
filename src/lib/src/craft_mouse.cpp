@@ -214,6 +214,10 @@ namespace CRAFT {
 			)
 		{
 
+			if(!m_initialized) {
+				THROW_CRAFT_MOUSE_EXCEPTION(CRAFT_MOUSE_EXCEPTION_UNINITIALIZED);
+			}
+
 			switch(event.button) {
 				case SDL_BUTTON_X1:
 					m_scroll.y = 1;
@@ -241,10 +245,14 @@ namespace CRAFT {
 			)
 		{
 
+			if(!m_initialized) {
+				THROW_CRAFT_MOUSE_EXCEPTION(CRAFT_MOUSE_EXCEPTION_UNINITIALIZED);
+			}
+
 			if(m_relative) {
-				m_position = {event.x, event.y};
-			} else {
 				m_position = {event.xrel, event.yrel};
+			} else {
+				m_position = {event.x, event.y};
 			}
 		}
 
@@ -253,6 +261,11 @@ namespace CRAFT {
 			__in const SDL_MouseWheelEvent &event
 			)
 		{
+
+			if(!m_initialized) {
+				THROW_CRAFT_MOUSE_EXCEPTION(CRAFT_MOUSE_EXCEPTION_UNINITIALIZED);
+			}
+
 			m_scroll = {event.x, event.y};
 		}
 

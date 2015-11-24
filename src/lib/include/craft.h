@@ -62,8 +62,6 @@ namespace CRAFT {
 
 			bool is_running(void);
 
-			void poll_input(void);
-
 			void start(
 				__in bool fullscreen,
 				__in_opt size_t width = WINDOW_WIDTH_MIN,
@@ -126,15 +124,11 @@ namespace CRAFT {
 
 			static _craft *m_instance;
 
-			craft_camera *m_instance_camera;
-
 			craft_display *m_instance_display;
 
 			craft_gl *m_instance_gl;
 
-			craft_keyboard *m_instance_keyboard;
-
-			craft_mouse *m_instance_mouse;
+			craft_world *m_instance_world;
 
 			bool m_running;
 

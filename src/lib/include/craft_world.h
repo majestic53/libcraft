@@ -56,13 +56,27 @@ namespace CRAFT {
 					__in const SDL_MouseWheelEvent &event
 					);
 
+				void poll_input(void);
+
 				void render(void);
 
 				void reset(void);
 
+				std::string to_string(
+					__in_opt bool verbose = false
+					);
+
 				void uninitialize(void);
 
-				glm::mat4 update(
+				void update(
+					__in GLfloat delta
+					);
+
+				void update_input(
+					__in GLfloat delta
+					);
+
+				void update_world(
 					__in GLfloat delta
 					);
 
@@ -94,9 +108,9 @@ namespace CRAFT {
 
 				craft_mouse *m_instance_mouse;
 
-				glm::vec2 m_motion;
+				glm::mat4 m_mvp;
 
-				GLfloat m_speed;
+				SDL_Window *m_window;
 
 		} craft_world;
 	}
