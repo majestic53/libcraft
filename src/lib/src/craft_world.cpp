@@ -31,6 +31,7 @@ namespace CRAFT {
 			m_instance_camera(craft_camera::acquire()),
 			m_instance_keyboard(craft_keyboard::acquire()),
 			m_instance_mouse(craft_mouse::acquire()),
+			m_instance_test(craft_test::acquire()),
 			m_window(NULL)
 		{
 			std::atexit(craft_world::_delete);
@@ -183,7 +184,9 @@ namespace CRAFT {
 			glClearColor(0.f, 0.f, 0.f, 1.f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			// TODO
+			// TODO: render world
+			m_instance_test->render(m_mvp);
+			// ---
 
 			glFlush();
 			SDL_GL_SwapWindow(m_window);
@@ -215,6 +218,7 @@ namespace CRAFT {
 			m_instance_keyboard->initialize(KEY_SET);
 			m_instance_mouse->initialize(m_window, true);
 			m_instance_camera->initialize({width, height});
+			m_instance_test->initialize();
 			reset();
 		}
 
@@ -227,6 +231,7 @@ namespace CRAFT {
 			}
 
 			clear();
+			m_instance_test->uninitialize();
 			m_instance_camera->uninitialize();
 			m_instance_mouse->uninitialize();
 			m_instance_keyboard->uninitialize();
@@ -329,6 +334,8 @@ namespace CRAFT {
 			}
 
 			// TODO: update world logic
+			m_instance_test->update(delta);
+			// ---
 		}
 	}
 }

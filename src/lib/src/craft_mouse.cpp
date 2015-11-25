@@ -272,12 +272,16 @@ namespace CRAFT {
 		glm::ivec2 
 		_craft_mouse::position(void)
 		{
+			glm::ivec2 result;
 
 			if(!m_initialized) {
 				THROW_CRAFT_MOUSE_EXCEPTION(CRAFT_MOUSE_EXCEPTION_UNINITIALIZED);
 			}
 
-			return m_position;	
+			result = m_position;
+			m_position = {0, 0};
+
+			return result;	
 		}
 
 		glm::ivec2 

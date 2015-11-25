@@ -32,6 +32,14 @@
 
 using namespace CRAFT;
 
+#ifndef TEST
+#define TEST test
+#endif // TEST
+
+#include "craft_test.h"
+
+using namespace CRAFT::TEST;
+
 #ifndef COMPONENT
 #define COMPONENT component
 #endif // COMPONENT

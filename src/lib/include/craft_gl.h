@@ -30,13 +30,14 @@ namespace CRAFT {
 
 			static _craft_gl *acquire(void);
 
-			GLuint add_pogram(
+			GLuint add_program(
 				__in GLuint fragment,
 				__in GLuint vertex
 				);
 
 			GLuint add_shader(
 				__in const std::string &source,
+				__in bool is_file,
 				__in GLenum type
 				);
 

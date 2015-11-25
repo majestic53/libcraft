@@ -17,29 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../lib/include/craft.h"
+#version 130
 
-int 
-main(void) 
-{
-	int result = 0;
-	craft *instance = NULL;
+in vec3 position;
+in vec3 in_color;
+out vec3 out_color;
+uniform mat4 mvp;
 
-	try {
-		instance = craft::acquire();
-		instance->initialize();
-		instance->start(false, 1024, 768);
-		instance->uninitialize();
-	} catch(craft_exception &exc) {
-		std::cerr << exc.to_string(true) << std::endl;
-		result = SCALAR_INVALID(int);
-		goto exit;
-	} catch(std::runtime_error &exc) {
-		std::cerr << exc.what() << std::endl;
-		result = SCALAR_INVALID(int);
-		goto exit;
-	}
-
-exit:
-	return result;
+void 
+main(void)
+{	
+	gl_Position =  mvp * vec4(position, 1.f);
+	out_color = in_color;
 }

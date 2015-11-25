@@ -17,22 +17,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CRAFT_WORLD_H_
-#define CRAFT_WORLD_H_
+#ifndef CRAFT_TEST_H_
+#define CRAFT_TEST_H_
 
 namespace CRAFT {
 
-	namespace COMPONENT {
+	namespace TEST {
 
-		typedef class _craft_world {
+		typedef class _craft_test {
 
 			public:
 
-				~_craft_world(void);
+				~_craft_test(void);
 
-				static _craft_world *acquire(void);
-
-				void clear(void);
+				static _craft_test *acquire(void);
 
 				void initialize(void);
 
@@ -40,27 +38,9 @@ namespace CRAFT {
 
 				bool is_initialized(void);
 
-				void on_event(
-					__in const SDL_KeyboardEvent &event
+				void render(
+					__in const glm::mat4 &mvp
 					);
-
-				void on_event(
-					__in const SDL_MouseButtonEvent &event
-					);
-
-				void on_event(
-					__in const SDL_MouseMotionEvent &event
-					);
-
-				void on_event(
-					__in const SDL_MouseWheelEvent &event
-					);
-
-				void poll_input(void);
-
-				void render(void);
-
-				void reset(void);
 
 				std::string to_string(
 					__in_opt bool verbose = false
@@ -72,24 +52,16 @@ namespace CRAFT {
 					__in GLfloat delta
 					);
 
-				void update_input(
-					__in GLfloat delta
-					);
-
-				void update_world(
-					__in GLfloat delta
-					);
-
 			protected:
 
-				_craft_world(void);
+				_craft_test(void);
 
-				_craft_world(
-					__in const _craft_world &other
+				_craft_test(
+					__in const _craft_test &other
 					);
 
-				_craft_world &operator=(
-					__in const _craft_world &other
+				_craft_test &operator=(
+					__in const _craft_test &other
 					);
 
 				static void _delete(void);
@@ -98,24 +70,26 @@ namespace CRAFT {
 
 				void teardown(void);
 
+				GLuint m_array_vertex;
+
+				GLuint m_buffer_fragment;
+
+				GLuint m_buffer_vertex;
+
 				bool m_initialized;
 
-				static _craft_world *m_instance;
+				static _craft_test *m_instance;
 
-				craft_camera *m_instance_camera;
+				GLint m_matrix;
 
-				craft_keyboard *m_instance_keyboard;
+				GLuint m_program;
 
-				craft_mouse *m_instance_mouse;
+				GLuint m_shader_fragment;
 
-				craft_test *m_instance_test;
+				GLuint m_shader_vertex;
 
-				glm::mat4 m_mvp;
-
-				SDL_Window *m_window;
-
-		} craft_world;
+		} craft_test;
 	}
 }
 
-#endif // CRAFT_WORLD_H_
+#endif // CRAFT_TEST_H_

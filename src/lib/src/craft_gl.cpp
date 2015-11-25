@@ -96,7 +96,7 @@ namespace CRAFT {
 	}
 
 	GLuint 
-	_craft_gl::add_pogram(
+	_craft_gl::add_program(
 		__in GLuint fragment,
 		__in GLuint vertex
 		)
@@ -149,15 +149,34 @@ namespace CRAFT {
 	GLuint 
 	_craft_gl::add_shader(
 		__in const std::string &source,
+		__in bool is_file,
 		__in GLenum type
 		)
 	{
-		GLuint result = 0;
-		std::string buffer;
+		GLuint result = 0;		
 		GLint length, status;
+		std::string buffer, data;
 
 		if(!m_initialized) {
 			THROW_CRAFT_GL_EXCEPTION(CRAFT_GL_EXCEPTION_UNINITIALIZED);
+		}
+
+		if(is_file) {
+
+			std::ifstream file(source.c_str(), std::ios::in);
+			if(!file) {
+				THROW_CRAFT_GL_EXCEPTION_FORMAT(CRAFT_GL_EXCEPTION_FILE_NOT_FOUND,
+					"%s", STRING_CHECK(source));
+			}
+
+			file.seekg(0, std::ios::end);
+			length = file.tellg();
+			file.seekg(0, std::ios::beg);
+			data.resize(++length);
+			file.read((char *) &data[0], length);
+			file.close();
+		} else {
+			data = source;
 		}
 
 		result = glCreateShader(type);
@@ -166,8 +185,8 @@ namespace CRAFT {
 				"%s", "glCreateShader failed");
 		}
 
-		const char *source_addr = source.c_str();
-		glShaderSource(result, 1, (const GLchar **) &source_addr, NULL);
+		const char *data_addr = data.c_str();
+		glShaderSource(result, 1, (const GLchar **) &data_addr, NULL);
 		glCompileShader(result);
 
 		glGetShaderiv(result, GL_COMPILE_STATUS, &status);
