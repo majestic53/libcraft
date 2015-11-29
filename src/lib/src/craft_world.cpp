@@ -227,6 +227,10 @@ namespace CRAFT {
 			m_instance_camera->initialize({width, height});
 			m_instance_test->initialize();
 			reset();
+
+			// TODO: DEBUG
+			std::cout << m_instance_random->generate_perlin_2d(5, 5, 20).to_string(true) << std::endl;
+			// ---
 		}
 
 		void 

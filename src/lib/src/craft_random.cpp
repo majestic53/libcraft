@@ -22,6 +22,229 @@
 
 namespace CRAFT {
 
+	_craft_perlin_2d::_craft_perlin_2d(
+		__in uint32_t width,
+		__in uint32_t height,
+		__in uint32_t samples
+		) :
+			m_height(height),
+			m_sample_count({0, 0}),
+			m_samples(samples),
+			m_width(width)
+	{
+
+		if(!m_height || !m_samples || !m_width) {
+			THROW_CRAFT_RANDOM_EXCEPTION_FORMAT(CRAFT_RANDOM_EXCEPTION_INVALID_DIMENSIONS,
+				"{%lu, %lu}, %lu", width, height, samples);
+		}
+	}
+
+	_craft_perlin_2d::_craft_perlin_2d(
+		__in const _craft_perlin_2d &other
+		) :
+			m_gradient(other.m_gradient),
+			m_height(other.m_height),
+			m_sample_count(other.m_sample_count),
+			m_sample_value(other.m_sample_value),
+			m_samples(other.m_samples),
+			m_width(other.m_width)
+	{
+		return;
+	}
+
+	_craft_perlin_2d::~_craft_perlin_2d(void)
+	{
+		return;
+	}
+
+	_craft_perlin_2d &
+	_craft_perlin_2d::operator=(
+		__in const _craft_perlin_2d &other
+		)
+	{
+
+		if(this != &other) {
+			m_gradient = other.m_gradient;
+			m_height = other.m_height;
+			m_sample_count = other.m_sample_count;
+			m_sample_value = other.m_sample_value;
+			m_samples = other.m_samples;
+			m_width = other.m_width;
+		}
+
+		return *this;
+	}
+
+	void 
+	_craft_perlin_2d::clear(void)
+	{
+		m_gradient.clear();
+		m_sample_count = {0, 0};
+		m_sample_value.clear();
+	}
+
+	_craft_perlin_2d 
+	_craft_perlin_2d::generate(
+		__in uint32_t width,
+		__in uint32_t height,
+		__in uint32_t samples
+		)
+	{
+		craft_perlin_2d result(width, height, samples);
+
+		result.run();
+
+		return result;
+	}
+
+	uint32_t 
+	_craft_perlin_2d::height(void)
+	{
+		return m_height;
+	}
+
+	void 
+	_craft_perlin_2d::initialize_vectors(void)
+	{
+		size_t count = 0;
+		craft_random *inst = NULL;
+		std::vector<glm::vec2>::iterator gradient_iter;
+		double current_x = 0, current_y = 0, delta_x, delta_y;
+		std::vector<std::pair<glm::vec2, double>>::iterator sample_iter;
+
+		m_sample_count.x = m_width * m_samples;
+		m_sample_count.y = m_height * m_samples;
+
+		inst = craft_random::acquire();
+		m_gradient.resize(m_width * m_height, {0.0, 0.0});
+
+		for(gradient_iter = m_gradient.begin(); gradient_iter != m_gradient.end(); ++gradient_iter) {
+			gradient_iter->x = inst->generate_float();
+			gradient_iter->y = inst->generate_float();
+		}
+
+		m_sample_value.resize(m_sample_count.x * m_sample_count.y, 
+			std::pair<glm::vec2, double>({0.0, 0.0}, 0.0));
+		delta_x = m_width / (double) (m_sample_count.x - 1);
+		delta_y = m_height / (double) (m_sample_count.y - 1);
+
+		for(sample_iter = m_sample_value.begin(); sample_iter != m_sample_value.end(); 
+				++sample_iter, ++count, ++current_x) {
+
+			if(count == m_sample_count.x) {
+				current_x = 0.0;
+				++current_y;
+				count = 0;
+			}
+
+			sample_iter->first.x = current_x * delta_x;
+			sample_iter->first.y = current_y * delta_y;
+		}
+	}
+
+	void 
+	_craft_perlin_2d::run(void)
+	{
+		double current_x = 0, current_y = 0;
+		std::vector<std::pair<glm::vec2, double>>::iterator sample_iter;
+
+		clear();
+		initialize_vectors();
+
+		for(sample_iter = m_sample_value.begin(); sample_iter != m_sample_value.end(); 
+				++sample_iter, ++count, ++current_x) {
+
+			if(count == m_sample_count.x) {
+				current_x = 0.0;
+				++current_y;
+				count = 0;
+			}
+
+			// TODO: run calculation on [current_x][current_y] and place result under iter->second
+		}
+	}
+
+	uint32_t 
+	_craft_perlin_2d::samples(void)
+	{
+		return m_samples;
+	}
+
+	std::string 
+	_craft_perlin_2d::to_string(
+		__in_opt bool verbose
+		)
+	{
+		size_t count;
+		std::stringstream result;
+		std::vector<glm::vec2>::iterator gradient_iter;
+		std::vector<std::pair<glm::vec2, double>>::iterator sample_iter;
+
+		result << CRAFT_PERLIN_HEADER << " ({" << m_width << ", " << m_height << "}, SAMP. " 
+			<< m_samples << ", GRAD. " << m_gradient.size() << ", SAMPOS. {" << m_sample_count.x 
+			<< ", " << m_sample_count.y << "}, " << m_sample_value.size() << ")";
+
+		if(verbose) {
+
+			for(gradient_iter = m_gradient.begin(), count = 0; gradient_iter != m_gradient.end(); 
+					++gradient_iter, ++count) {
+
+				if(gradient_iter != m_gradient.begin()) {
+					result << ", ";
+				}
+
+				if((gradient_iter == m_gradient.begin()) || (count == m_width)) {
+					result << std::endl;
+					count = 0;
+				}
+
+				result << "{" << gradient_iter->x << ", " << gradient_iter->y << "}";
+			}
+
+			result << std::endl;
+
+			for(sample_iter = m_sample_value.begin(), count = 0; sample_iter != m_sample_value.end(); 
+					++sample_iter, ++count) {
+
+				if(sample_iter != m_sample_value.begin()) {
+					result << ", ";
+				}
+
+				if((sample_iter == m_sample_value.begin()) || (count == m_sample_count.x)) {
+					result << std::endl;
+					count = 0;
+				}
+
+				result << "{" << sample_iter->first.x << ", " << sample_iter->first.y << "}";
+			}
+
+			result << std::endl;
+
+			for(sample_iter = m_sample_value.begin(), count = 0; sample_iter != m_sample_value.end(); 
+					++sample_iter, ++count) {
+
+				if(sample_iter != m_sample_value.begin()) {
+					result << ", ";
+				}
+
+				if((sample_iter == m_sample_value.begin()) || (count == m_sample_count.x)) {
+					result << std::endl;
+					count = 0;
+				}
+
+				result << sample_iter->second;
+			}
+		}
+
+		return result.str();
+	}
+
+	uint32_t 
+	_craft_perlin_2d::width(void)
+	{
+		return m_width;
+	}
+
 	_craft_random *_craft_random::m_instance = NULL;
 
 	_craft_random::_craft_random(void) :
@@ -81,6 +304,40 @@ namespace CRAFT {
 		}
 
 		return std::uniform_int_distribution<int32_t>(min, max)(m_engine);
+	}
+
+	double 
+	_craft_random::generate_float(
+		__in_opt double min,
+		__in_opt double max
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_UNINITIALIZED);
+		}
+
+		if(min >= max) {
+			THROW_CRAFT_RANDOM_EXCEPTION_FORMAT(CRAFT_RANDOM_EXCEPTION_INVALID_RANGE,
+				"{%f - %f} (min >= max)", min, max);
+		}
+
+		return std::uniform_real_distribution<double>(min, max)(m_engine);
+	}
+
+	craft_perlin_2d 
+	_craft_random::generate_perlin_2d(
+		__in uint32_t width,
+		__in uint32_t height,
+		__in uint32_t samples
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_UNINITIALIZED);
+		}
+
+		return craft_perlin_2d::generate(width, height, samples);
 	}
 
 	uint32_t 

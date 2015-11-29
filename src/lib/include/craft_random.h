@@ -24,6 +24,64 @@
 
 namespace CRAFT {
 
+	typedef class _craft_perlin_2d {
+
+		public:
+
+			_craft_perlin_2d(
+				__in uint32_t width,
+				__in uint32_t height,
+				__in uint32_t samples
+				);
+
+			_craft_perlin_2d(
+				__in const _craft_perlin_2d &other
+				);
+
+			virtual ~_craft_perlin_2d(void);
+
+			_craft_perlin_2d &operator=(
+				__in const _craft_perlin_2d &other
+				);
+
+			void clear(void);
+
+			static _craft_perlin_2d generate(
+				__in uint32_t width,
+				__in uint32_t height,
+				__in uint32_t samples
+				);
+
+			uint32_t height(void);
+
+			void run(void);
+
+			uint32_t samples(void);
+
+			virtual std::string to_string(
+				__in_opt bool verbose = false
+				);
+
+			uint32_t width(void);
+
+		protected:
+
+			void initialize_vectors(void);
+
+			std::vector<glm::vec2> m_gradient;
+
+			uint32_t m_height;
+
+			glm::uvec2 m_sample_count;
+
+			std::vector<std::pair<glm::vec2, double>> m_sample_value;
+
+			uint32_t m_samples;
+
+			uint32_t m_width;
+
+	} craft_perlin_2d;
+
 	typedef class _craft_random {
 
 		public:
@@ -32,7 +90,16 @@ namespace CRAFT {
 
 			static _craft_random *acquire(void);
 
-			// TODO: generate_perlin_2d
+			double generate_float(
+				__in_opt double min = -1.0,
+				__in_opt double max = 1.0
+				);
+
+			craft_perlin_2d generate_perlin_2d(
+				__in uint32_t width,
+				__in uint32_t height,
+				__in uint32_t samples
+				);
 
 			int32_t generate_signed(
 				__in_opt int32_t min = INT32_MIN,
