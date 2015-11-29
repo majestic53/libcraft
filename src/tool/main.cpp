@@ -19,6 +19,12 @@
 
 #include "../lib/include/craft.h"
 
+#define TEST_FULLSCREEN true
+#define TEST_WIDTH 1920
+#define TEST_HEIGHT 1080
+
+#define TEST_SEED 0xdeadbeef
+
 int 
 main(void) 
 {
@@ -28,7 +34,7 @@ main(void)
 	try {
 		instance = craft::acquire();
 		instance->initialize();
-		instance->start(false, 1024, 768);
+		instance->start(TEST_SEED, TEST_FULLSCREEN, TEST_WIDTH, TEST_HEIGHT);
 		instance->uninitialize();
 	} catch(craft_exception &exc) {
 		std::cerr << exc.to_string(true) << std::endl;

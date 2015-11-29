@@ -131,6 +131,7 @@ namespace CRAFT {
 
 	void 
 	_craft::run(
+		__in uint32_t seed,
 		__in bool fullscreen,
 		__in_opt size_t width,
 		__in_opt size_t height
@@ -147,7 +148,7 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STARTED);
 		}
 
-		setup(fullscreen, width, height);
+		setup(seed, fullscreen, width, height);
 		m_running = true;
 
 		while(m_running) {
@@ -190,6 +191,7 @@ namespace CRAFT {
 
 	void 
 	_craft::setup(
+		__in uint32_t seed,
 		__in bool fullscreen,
 		__in_opt size_t width,
 		__in_opt size_t height
@@ -213,7 +215,7 @@ namespace CRAFT {
 		m_instance_display->start(WINDOW_TITLE, WINDOW_LEFT, WINDOW_TOP, 
 			width, height, flags);
 		craft_gl::initialize_external(DISPLAY_GL_VERSION);
-		m_instance_world->initialize();
+		m_instance_world->initialize(seed);
 	}
 
 	void 
@@ -247,6 +249,7 @@ namespace CRAFT {
 
 	void 
 	_craft::start(
+		__in uint32_t seed,
 		__in bool fullscreen,
 		__in_opt size_t width,
 		__in_opt size_t height
@@ -261,7 +264,7 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STARTED);
 		}
 
-		run(fullscreen, width, height);
+		run(seed, fullscreen, width, height);
 	}
 
 	void 

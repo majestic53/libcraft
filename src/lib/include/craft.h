@@ -29,6 +29,7 @@
 #include "craft_define.h"
 #include "craft_exception.h"
 #include "craft_gl.h"
+#include "craft_random.h"
 
 using namespace CRAFT;
 
@@ -71,6 +72,7 @@ namespace CRAFT {
 			bool is_running(void);
 
 			void start(
+				__in uint32_t seed,
 				__in bool fullscreen,
 				__in_opt size_t width = WINDOW_WIDTH_MIN,
 				__in_opt size_t height = WINDOW_HEIGHT_MIN
@@ -105,12 +107,14 @@ namespace CRAFT {
 			void render(void);
 
 			void run(
+				__in uint32_t seed,
 				__in bool fullscreen,
 				__in_opt size_t width = WINDOW_WIDTH_MIN,
 				__in_opt size_t height = WINDOW_HEIGHT_MIN
 				);
 
 			void setup(
+				__in uint32_t seed,
 				__in bool fullscreen,
 				__in_opt size_t width = WINDOW_WIDTH_MIN,
 				__in_opt size_t height = WINDOW_HEIGHT_MIN

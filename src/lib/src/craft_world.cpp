@@ -31,6 +31,7 @@ namespace CRAFT {
 			m_instance_camera(craft_camera::acquire()),
 			m_instance_keyboard(craft_keyboard::acquire()),
 			m_instance_mouse(craft_mouse::acquire()),
+			m_instance_random(craft_random::acquire()),
 			m_instance_test(craft_test::acquire()),
 			m_window(NULL)
 		{
@@ -85,7 +86,9 @@ namespace CRAFT {
 		}
 
 		void 
-		_craft_world::initialize(void)
+		_craft_world::initialize(
+			__in uint32_t seed
+			)
 		{
 
 			if(m_initialized) {
@@ -94,7 +97,7 @@ namespace CRAFT {
 
 			m_initialized = true;
 			m_window = craft_display::acquire()->window();
-			setup();
+			setup(seed);
 		}
 
 		bool 
@@ -200,13 +203,16 @@ namespace CRAFT {
 				THROW_CRAFT_WORLD_EXCEPTION(CRAFT_WORLD_EXCEPTION_UNINITIALIZED);
 			}
 
+			m_instance_random->reset();
 			m_instance_camera->reset();
 			m_instance_keyboard->reset();
 			m_instance_mouse->reset();
 		}
 
 		void 
-		_craft_world::setup(void)
+		_craft_world::setup(
+			__in uint32_t seed
+			)
 		{
 			int height = 0, width = 0;
 
@@ -214,6 +220,7 @@ namespace CRAFT {
 				THROW_CRAFT_WORLD_EXCEPTION(CRAFT_WORLD_EXCEPTION_UNINITIALIZED);
 			}
 
+			m_instance_random->initialize(seed);
 			SDL_GetWindowSize(m_window, &width, &height);
 			m_instance_keyboard->initialize(KEY_SET);
 			m_instance_mouse->initialize(m_window, true);
@@ -235,6 +242,7 @@ namespace CRAFT {
 			m_instance_camera->uninitialize();
 			m_instance_mouse->uninitialize();
 			m_instance_keyboard->uninitialize();
+			m_instance_random->uninitialize();
 		}
 
 		std::string 

@@ -13,6 +13,10 @@ Changelog
 =========
 
 ##Version 0.1.1548
+*Updated:11/28/2015*
+
+* Added RNG class (partial)
+
 *Updated:11/24/2015*
 
 * Added test class

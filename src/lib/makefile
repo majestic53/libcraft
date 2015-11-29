@@ -29,11 +29,12 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)craft.o $(DIR_BUILD)craft_camera.o $(DIR_BUILD)craft_display.o $(DIR_BUILD)craft_exception.o \
-		$(DIR_BUILD)craft_gl.o $(DIR_BUILD)craft_keyboard.o $(DIR_BUILD)craft_mouse.o $(DIR_BUILD)craft_test.o $(DIR_BUILD)craft_world.o
+		$(DIR_BUILD)craft_gl.o $(DIR_BUILD)craft_keyboard.o $(DIR_BUILD)craft_mouse.o $(DIR_BUILD)craft_random.o $(DIR_BUILD)craft_test.o \
+		$(DIR_BUILD)craft_world.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: craft.o craft_camera.o craft_display.o craft_exception.o craft_gl.o craft_keyboard.o craft_mouse.o craft_test.o craft_world.o
+build: craft.o craft_camera.o craft_display.o craft_exception.o craft_gl.o craft_keyboard.o craft_mouse.o craft_random.o craft_test.o craft_world.o
 
 craft.o: $(DIR_SRC)craft.cpp $(DIR_INC)craft.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)craft.cpp -o $(DIR_BUILD)craft.o
@@ -43,6 +44,9 @@ craft_exception.o: $(DIR_SRC)craft_exception.cpp $(DIR_INC)craft_exception.h
 
 craft_gl.o: $(DIR_SRC)craft_gl.cpp $(DIR_INC)craft_gl.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)craft_gl.cpp -o $(DIR_BUILD)craft_gl.o
+
+craft_random.o: $(DIR_SRC)craft_random.cpp $(DIR_INC)craft_random.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)craft_random.cpp -o $(DIR_BUILD)craft_random.o
 
 # COMPONENTS
 

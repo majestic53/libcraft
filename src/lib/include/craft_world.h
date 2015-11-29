@@ -34,7 +34,9 @@ namespace CRAFT {
 
 				void clear(void);
 
-				void initialize(void);
+				void initialize(
+					__in uint32_t seed
+					);
 
 				static bool is_allocated(void);
 
@@ -94,7 +96,9 @@ namespace CRAFT {
 
 				static void _delete(void);
 
-				void setup(void);
+				void setup(
+					__in uint32_t seed
+					);
 
 				void teardown(void);
 
@@ -107,6 +111,8 @@ namespace CRAFT {
 				craft_keyboard *m_instance_keyboard;
 
 				craft_mouse *m_instance_mouse;
+
+				craft_random *m_instance_random;
 
 				craft_test *m_instance_test;
 
