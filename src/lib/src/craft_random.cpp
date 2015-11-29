@@ -145,6 +145,7 @@ namespace CRAFT {
 	void 
 	_craft_perlin_2d::run(void)
 	{
+		size_t count = 0;
 		double current_x = 0, current_y = 0;
 		std::vector<std::pair<glm::vec2, double>>::iterator sample_iter;
 
