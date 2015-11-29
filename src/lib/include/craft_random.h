@@ -74,11 +74,11 @@ namespace CRAFT {
 
 			static void _delete(void);
 
+			std::mt19937 m_engine;
+
 			bool m_initialized;
 
 			static _craft_random *m_instance;
-
-			std::mt19937 m_engine;
 
 			uint32_t m_seed;
 

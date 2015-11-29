@@ -77,7 +77,7 @@ namespace CRAFT {
 
 		if(min >= max) {
 			THROW_CRAFT_RANDOM_EXCEPTION_FORMAT(CRAFT_RANDOM_EXCEPTION_INVALID_RANGE,
-				"{%l - %l} (min >= max)", min, max);
+				"{%ls - %ls} (min >= max)", min, max);
 		}
 
 		return std::uniform_int_distribution<int32_t>(min, max)(m_engine);
