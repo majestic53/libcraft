@@ -58,6 +58,11 @@ namespace CRAFT {
 
 			uint32_t samples(void);
 
+			void to_file(
+				__in const std::string &path,
+				__in_opt bool colorize = false
+				);
+
 			virtual std::string to_string(
 				__in_opt bool verbose = false
 				);
@@ -68,13 +73,22 @@ namespace CRAFT {
 
 			void initialize_vectors(void);
 
+			double interpolate(
+				__in const glm::vec2 &position,
+				__in const glm::uvec2 &lattice,
+				__in double value11,
+				__in double value12,
+				__in double value21,
+				__in double value22
+				);
+
 			std::vector<glm::vec2> m_gradient;
 
 			uint32_t m_height;
 
 			glm::uvec2 m_sample_count;
 
-			std::vector<std::pair<glm::vec2, double>> m_sample_value;
+			std::vector<glm::vec3> m_sample_value;
 
 			uint32_t m_samples;
 
@@ -120,6 +134,11 @@ namespace CRAFT {
 			bool is_initialized(void);
 
 			void reset(void);
+
+			void to_file(
+				__in const std::string &path,
+				__in_opt bool colorize = false
+				);
 
 			std::string to_string(
 				__in_opt bool verbose = false

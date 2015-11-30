@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <fstream>
 #include "../include/craft.h"
 #include "../include/craft_random_type.h"
 
@@ -106,62 +107,96 @@ namespace CRAFT {
 	void 
 	_craft_perlin_2d::initialize_vectors(void)
 	{
-		size_t count = 0;
+		size_t count = 0;		
 		craft_random *inst = NULL;
+		glm::vec2 current = {0.0, 0.0}, delta;
+		std::vector<glm::vec3>::iterator sample_iter;
 		std::vector<glm::vec2>::iterator gradient_iter;
-		double current_x = 0, current_y = 0, delta_x, delta_y;
-		std::vector<std::pair<glm::vec2, double>>::iterator sample_iter;
 
 		m_sample_count.x = m_width * m_samples;
 		m_sample_count.y = m_height * m_samples;
 
 		inst = craft_random::acquire();
-		m_gradient.resize(m_width * m_height, {0.0, 0.0});
+		m_gradient.resize((m_width + 1) * (m_height + 1), {0.0, 0.0});
 
 		for(gradient_iter = m_gradient.begin(); gradient_iter != m_gradient.end(); ++gradient_iter) {
 			gradient_iter->x = inst->generate_float();
 			gradient_iter->y = inst->generate_float();
 		}
 
-		m_sample_value.resize(m_sample_count.x * m_sample_count.y, 
-			std::pair<glm::vec2, double>({0.0, 0.0}, 0.0));
-		delta_x = m_width / (double) (m_sample_count.x - 1);
-		delta_y = m_height / (double) (m_sample_count.y - 1);
+		m_sample_value.resize(m_sample_count.x * m_sample_count.y, {0.0, 0.0, 0.0});
+		delta.x = m_width / (double) (m_sample_count.x - 1.0);
+		delta.y = m_height / (double) (m_sample_count.y - 1.0);
 
 		for(sample_iter = m_sample_value.begin(); sample_iter != m_sample_value.end(); 
-				++sample_iter, ++count, ++current_x) {
+				++sample_iter, ++count, ++current.x) {
 
 			if(count == m_sample_count.x) {
-				current_x = 0.0;
-				++current_y;
+				current.x = 0.0;
+				++current.y;
 				count = 0;
 			}
 
-			sample_iter->first.x = current_x * delta_x;
-			sample_iter->first.y = current_y * delta_y;
+			sample_iter->x = current.x * delta.x;
+			sample_iter->y = current.y * delta.y;
 		}
+	}
+
+	double 
+	_craft_perlin_2d::interpolate(
+		__in const glm::vec2 &position,
+		__in const glm::uvec2 &lattice,
+		__in double value11,
+		__in double value12,
+		__in double value21,
+		__in double value22
+		)
+	{
+
+		return (value11 * ((lattice.x + 1.0) - position.x) * (lattice.y - position.y) 
+			+ value21 * (position.x - lattice.x) * (lattice.y - position.y) 
+			+ value12 * ((lattice.x + 1.0) - position.x) * (position.y - (lattice.y + 1.0)) 
+			+ value22 * (position.x - lattice.x) * (position.y - (lattice.y + 1.0)));
 	}
 
 	void 
 	_craft_perlin_2d::run(void)
 	{
 		size_t count = 0;
-		double current_x = 0, current_y = 0;
-		std::vector<std::pair<glm::vec2, double>>::iterator sample_iter;
+		glm::uvec2 lattice;
+		std::vector<glm::vec3>::iterator iter;
+		glm::vec2 current = {0.0, 0.0}, delta;
 
 		clear();
 		initialize_vectors();
 
-		for(sample_iter = m_sample_value.begin(); sample_iter != m_sample_value.end(); 
-				++sample_iter, ++count, ++current_x) {
+		for(iter = m_sample_value.begin(); iter != m_sample_value.end(); 
+				++iter, ++count, ++current.x) {
 
 			if(count == m_sample_count.x) {
-				current_x = 0.0;
-				++current_y;
+				current.x = 0.0;
+				++current.y;
 				count = 0;
 			}
 
-			// TODO: run calculation on [current_x][current_y] and place result under iter->second
+			lattice.x = (uint32_t) iter->x;
+			lattice.y = (uint32_t) iter->y;
+
+			if(iter->x && !std::fmod(iter->x, 1.0)) {
+				--lattice.x;
+			}
+
+			if(iter->y && !std::fmod(iter->y, 1.0)) {
+				--lattice.y;
+			}
+
+			delta.x = iter->x - lattice.x;
+			delta.y = iter->y - lattice.y;
+			iter->z = interpolate({iter->x, iter->y}, lattice, 
+				glm::dot({-delta.x, 1.0 - delta.y}, m_gradient.at(((lattice.y + 1) * m_width) + lattice.x)),
+				glm::dot({-delta.x, -delta.y}, m_gradient.at((lattice.y * m_width) + lattice.x)),
+				glm::dot({1.0 - delta.x, 1.0 - delta.y}, m_gradient.at(((lattice.y + 1) * m_width) + (lattice.x + 1))),
+				glm::dot({1.0 - delta.x, -delta.y}, m_gradient.at((lattice.y * m_width) + (lattice.x + 1))));
 		}
 	}
 
@@ -171,6 +206,72 @@ namespace CRAFT {
 		return m_samples;
 	}
 
+	void 
+	_craft_perlin_2d::to_file(
+		__in const std::string &path,
+		__in_opt bool colorize
+		)
+	{
+		size_t count = 0;
+		double normalized;
+		std::stringstream stream;
+		std::vector<glm::vec3>::iterator iter;
+		std::ofstream file(path.c_str(), std::ios::out);
+
+		if(!file) {
+			THROW_CRAFT_RANDOM_EXCEPTION_FORMAT(CRAFT_RANDOM_EXCEPTION_FILE_NOT_FOUND,
+				"%s", STRING_CHECK(path));
+		}
+
+		if(colorize) {
+			stream << "P3" << std::endl;
+		} else {
+			stream << "P2" << std::endl;
+		}	
+
+		stream << m_sample_count.x << " " << m_sample_count.y << std::endl;
+
+		if(colorize) {
+			stream << 255 << std::endl;
+		} else {
+			stream << 128 << std::endl;
+		}
+
+		for(iter = m_sample_value.begin(); iter != m_sample_value.end(); 
+				++iter, ++count) {
+			normalized = ((iter->z + 1.0) * 0.5);
+
+			if(count == m_sample_count.x) {
+				stream << std::endl;
+				count = 0;
+			}
+
+			if(count > 0) {
+				stream << " ";
+			}
+
+			if(colorize) {
+
+				if((normalized >= 0.0) && (normalized < 0.3)) {
+					stream << "0 0 " << (uint32_t) (255.0 * (normalized / 0.3));
+				} else if((normalized >= 0.3) && (normalized < 0.4)) {
+					stream << "0 " << (uint32_t) (255.0 * ((normalized - 0.3) / 0.1)) << " 255";
+				} else if((normalized >= 0.4) && (normalized < 0.6)) {
+					stream << "0 255 " << (255.0 - (uint32_t) (255.0 * ((normalized - 0.4) / 0.2)));
+				} else if((normalized >= 0.6) && (normalized < 0.7)) {
+					stream << (uint32_t) (255.0 * ((normalized - 0.6) / 0.1)) << " 255 0";
+				} else {
+					stream << " 255 " << (255.0 - (uint32_t) (255.0 * ((normalized - 0.7) / 0.3))) << " 0";
+				}
+			} else {
+				stream << (uint32_t) (128.0 * normalized);
+			}
+		}
+
+		file.write(stream.str().c_str(), stream.str().size());
+		file.close();
+	}
+
 	std::string 
 	_craft_perlin_2d::to_string(
 		__in_opt bool verbose
@@ -178,8 +279,8 @@ namespace CRAFT {
 	{
 		size_t count;
 		std::stringstream result;
+		std::vector<glm::vec3>::iterator sample_iter;
 		std::vector<glm::vec2>::iterator gradient_iter;
-		std::vector<std::pair<glm::vec2, double>>::iterator sample_iter;
 
 		result << CRAFT_PERLIN_HEADER << " ({" << m_width << ", " << m_height << "}, SAMP. " 
 			<< m_samples << ", GRAD. " << m_gradient.size() << ", SAMPOS. {" << m_sample_count.x 
@@ -216,7 +317,7 @@ namespace CRAFT {
 					count = 0;
 				}
 
-				result << "{" << sample_iter->first.x << ", " << sample_iter->first.y << "}";
+				result << "{" << sample_iter->x << ", " << sample_iter->y << "}";
 			}
 
 			result << std::endl;
@@ -233,7 +334,7 @@ namespace CRAFT {
 					count = 0;
 				}
 
-				result << sample_iter->second;
+				result << sample_iter->z;
 			}
 		}
 
