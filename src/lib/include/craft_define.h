@@ -31,6 +31,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/noise.hpp> 
 #include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
 #include <SDL2/SDL.h>
@@ -86,6 +87,12 @@ namespace CRAFT {
 	#define MOUSE_DEFAULT_X 0
 	#define MOUSE_DEFAULT_Y 0
 
+	#define PERLIN_FREQ_SCALE 2.0
+	#define PERLIN_SAMPLE_COUNT 16
+	#define PERLIN_WEIGHT_0 (1.0 / 16.0)
+	#define PERLIN_WEIGHT_1 (1.0 / 8.0)
+	#define PERLIN_WEIGHT_2 (1.0 / 4.0)
+
 	#define REFERENCE_INITIAL 1
 
 	#define RESOLUTION_BUFFER 20
@@ -106,11 +113,11 @@ namespace CRAFT {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 4
+	#define VERSION_REVISION 1
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) \
 		"." STRING_CONCAT(VERSION_TICK) "." STRING_CONCAT(VERSION_REVISION)
-	#define VERSION_TICK 1548
+	#define VERSION_TICK 1549
 
 	#define WINDOW_FLAGS (SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN)// | SDL_WINDOW_INPUT_GRABBED)
 	#define WINDOW_HEIGHT_MIN 480

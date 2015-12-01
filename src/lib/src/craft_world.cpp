@@ -229,17 +229,8 @@ namespace CRAFT {
 			reset();
 
 			// TODO: DEBUG
-			/*craft_perlin_2d perlin0 = m_instance_random->generate_perlin_2d(100, 100, 4);
-			perlin0.to_file("./test0.pbm", false);
-
-			craft_perlin_2d perlin1 = m_instance_random->generate_perlin_2d(50, 50, 8);
-			perlin1.to_file("./test1.pbm", false);*/
-
-			craft_perlin_2d perlin2 = m_instance_random->generate_perlin_2d(20, 20, 20);
-			perlin2.to_file("./test2.pbm", false);
-
-			/*craft_perlin_2d perlin3 = m_instance_random->generate_perlin_2d(5, 5, 80);
-			perlin3.to_file("./test3.pbm", false);*/
+			craft_perlin_2d perlin(1.0, 1.0, 1.0, 1, seed);
+			perlin.to_file("./test.pbm", {0.0, 0.0}, {256.0, 256.0}, false);
 			// ---
 		}
 

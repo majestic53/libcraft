@@ -29,9 +29,11 @@ namespace CRAFT {
 		public:
 
 			_craft_perlin_2d(
-				__in uint32_t width,
-				__in uint32_t height,
-				__in uint32_t samples
+				__in double amplitude,
+				__in double frequency,
+				__in double persistence,
+				__in uint32_t octaves,
+				__in uint32_t seed
 				);
 
 			_craft_perlin_2d(
@@ -44,22 +46,24 @@ namespace CRAFT {
 				__in const _craft_perlin_2d &other
 				);
 
-			void clear(void);
+			double &amplitude(void);
 
-			static _craft_perlin_2d generate(
-				__in uint32_t width,
-				__in uint32_t height,
-				__in uint32_t samples
+			double &frequency(void);
+
+			double generate(
+				__in const glm::vec2 &position
 				);
 
-			uint32_t height(void);
+			uint32_t &octaves(void);
 
-			void run(void);
+			double &persistence(void);
 
-			uint32_t samples(void);
+			uint32_t &seed(void);
 
 			void to_file(
 				__in const std::string &path,
+				__in const glm::vec2 &origin,
+				__in const glm::uvec2 &dimension,
 				__in_opt bool colorize = false
 				);
 
@@ -67,32 +71,31 @@ namespace CRAFT {
 				__in_opt bool verbose = false
 				);
 
-			uint32_t width(void);
-
 		protected:
 
-			void initialize_vectors(void);
-
-			double interpolate(
-				__in const glm::vec2 &position,
-				__in const glm::uvec2 &lattice,
-				__in double value11,
-				__in double value12,
-				__in double value21,
-				__in double value22
+			double generate_interpolation(
+				__in const glm::vec3 &value
 				);
 
-			std::vector<glm::vec2> m_gradient;
+			double generate_noise(
+				__in const glm::vec2 &value
+				);
 
-			uint32_t m_height;
+			double generate_value(
+				__in const glm::vec2 &value
+				);
 
-			glm::uvec2 m_sample_count;
+			double m_amplitude;
 
-			std::vector<glm::vec3> m_sample_value;
+			double m_frequency;
 
-			uint32_t m_samples;
+			uint32_t m_octaves;
 
-			uint32_t m_width;
+			double m_persistence;
+
+			uint32_t m_seed;
+
+			void initialize(void);
 
 	} craft_perlin_2d;
 
@@ -107,12 +110,6 @@ namespace CRAFT {
 			double generate_float(
 				__in_opt double min = -1.0,
 				__in_opt double max = 1.0
-				);
-
-			craft_perlin_2d generate_perlin_2d(
-				__in uint32_t width,
-				__in uint32_t height,
-				__in uint32_t samples
 				);
 
 			int32_t generate_signed(
@@ -134,6 +131,8 @@ namespace CRAFT {
 			bool is_initialized(void);
 
 			void reset(void);
+
+			uint32_t seed(void);
 
 			void to_file(
 				__in const std::string &path,
