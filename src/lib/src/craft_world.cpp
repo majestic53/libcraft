@@ -229,8 +229,11 @@ namespace CRAFT {
 			reset();
 
 			// TODO: DEBUG
-			craft_perlin_2d perlin(1.0, 1.0, 1.0, 1, seed);
-			perlin.to_file("./test.pbm", {0.0, 0.0}, {256.0, 256.0}, false);
+			glm::uvec2 dimension;
+			glm::vec2 position = {0.0, 0.0}, offset = {256.0, 256.0};
+			std::vector<double> noise = craft_perlin_2d::acquire()->generate(dimension, position, offset, 
+				6, 5.0, 0.3, true);
+			craft_perlin_2d::acquire()->to_file("./test.pbm", noise, dimension, true);
 			// ---
 		}
 

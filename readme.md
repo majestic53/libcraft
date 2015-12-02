@@ -11,6 +11,10 @@ Table of Contents
 
 Changelog
 =========
+##Version 0.1.1549
+*Updated:12/1/2015*
+
+* Updated perlin noise algorithm
 
 ##Version 0.1.1548
 *Updated:11/29/2015*
@@ -28,32 +32,6 @@ Changelog
 *Updated:11/23/2015*
 
 * Added world class
-
-##Version 0.1.1547
-*Updated:11/22/2015*
-
-* Added camera class
-* Added world (player) class (partial)
-
-*Updated:11/21/2015*
-
-* Added routines to auto-detect resolution
-* Completed keyboard/mouse classes
-* Added camera class (partial)
-
-*Updated:11/20/2015*
-
-* Added gl program/shader/texture support
-* Added keyboard/mouse class files (partial)
-
-*Updated:11/19/2015*
-
-* Added display singleton class
-* Added gl singleton class (partial)
-
-*Updated:11/18/2015*
-
-* Initial commit
 
 *Changelog truncated (see file history for full log)*
 

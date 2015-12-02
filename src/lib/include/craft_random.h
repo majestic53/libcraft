@@ -28,74 +28,69 @@ namespace CRAFT {
 
 		public:
 
-			_craft_perlin_2d(
-				__in double amplitude,
-				__in double frequency,
-				__in double persistence,
+			~_craft_perlin_2d(void);
+
+			static _craft_perlin_2d *acquire(void);
+
+			std::vector<double> generate(
+				__out glm::uvec2 &dimension,
+				__in const glm::vec2 &position,
+				__in const glm::vec2 &offset,
 				__in uint32_t octaves,
-				__in uint32_t seed
+				__in double amplitude,
+				__in double persistence,
+				__in_opt bool bicubic = true
 				);
+
+			void initialize(void);
+
+			static bool is_allocated(void);
+
+			bool is_initialized(void);
+
+			static void to_file(
+				__in const std::string &path,
+				__in const std::vector<double> &noise,
+				__in const glm::uvec2 &dimension,
+				__in_opt bool colorize = false
+				);
+
+			std::string to_string(
+				__in_opt bool verbose = false
+				);
+
+			void uninitialize(void);
+
+		protected:
+
+			_craft_perlin_2d(void);
 
 			_craft_perlin_2d(
 				__in const _craft_perlin_2d &other
 				);
-
-			virtual ~_craft_perlin_2d(void);
 
 			_craft_perlin_2d &operator=(
 				__in const _craft_perlin_2d &other
 				);
 
-			double &amplitude(void);
+			static void _delete(void);
 
-			double &frequency(void);
-
-			double generate(
-				__in const glm::vec2 &position
-				);
-
-			uint32_t &octaves(void);
-
-			double &persistence(void);
-
-			uint32_t &seed(void);
-
-			void to_file(
-				__in const std::string &path,
-				__in const glm::vec2 &origin,
+			void generate_noise(
+				__out std::vector<std::vector<double>> &noise,
 				__in const glm::uvec2 &dimension,
-				__in_opt bool colorize = false
+				__in const glm::vec2 &position,
+				__in uint32_t octaves,
+				__in_opt bool bicubic = true
 				);
 
-			virtual std::string to_string(
-				__in_opt bool verbose = false
+			double interpolate_noise(
+				__in const glm::vec3 &value,
+				__in_opt bool bicubic = true
 				);
 
-		protected:
+			bool m_initialized;
 
-			double generate_interpolation(
-				__in const glm::vec3 &value
-				);
-
-			double generate_noise(
-				__in const glm::vec2 &value
-				);
-
-			double generate_value(
-				__in const glm::vec2 &value
-				);
-
-			double m_amplitude;
-
-			double m_frequency;
-
-			uint32_t m_octaves;
-
-			double m_persistence;
-
-			uint32_t m_seed;
-
-			void initialize(void);
+			static _craft_perlin_2d *m_instance;
 
 	} craft_perlin_2d;
 
@@ -108,8 +103,18 @@ namespace CRAFT {
 			static _craft_random *acquire(void);
 
 			double generate_float(
-				__in_opt double min = -1.0,
+				__in_opt double min = 0.0,
 				__in_opt double max = 1.0
+				);
+
+			std::vector<double> generate_perlin_2d(
+				__out glm::uvec2 &dimension,
+				__in const glm::vec2 &position,
+				__in const glm::vec2 &offset,
+				__in uint32_t octaves,
+				__in double amplitude,
+				__in double persistence,
+				__in_opt bool bicubic = true
 				);
 
 			int32_t generate_signed(
@@ -134,11 +139,6 @@ namespace CRAFT {
 
 			uint32_t seed(void);
 
-			void to_file(
-				__in const std::string &path,
-				__in_opt bool colorize = false
-				);
-
 			std::string to_string(
 				__in_opt bool verbose = false
 				);
@@ -162,6 +162,8 @@ namespace CRAFT {
 			std::mt19937 m_engine;
 
 			bool m_initialized;
+
+			craft_perlin_2d *m_instance_perlin_2d;
 
 			static _craft_random *m_instance;
 

@@ -23,182 +23,224 @@
 
 namespace CRAFT {
 
-	_craft_perlin_2d::_craft_perlin_2d(
-		__in double amplitude,
-		__in double frequency,
-		__in double persistence,
-		__in uint32_t octaves,
-		__in uint32_t seed
-		) :
-			m_amplitude(amplitude),
-			m_frequency(frequency),
-			m_octaves(octaves),
-			m_persistence(persistence),
-			m_seed(seed)
-	{
-		return;
-	}
+	_craft_perlin_2d *_craft_perlin_2d::m_instance = NULL;
 
-	_craft_perlin_2d::_craft_perlin_2d(
-		__in const _craft_perlin_2d &other
-		) :
-			m_amplitude(other.m_amplitude),
-			m_frequency(other.m_frequency),
-			m_octaves(other.m_octaves),
-			m_persistence(other.m_persistence),
-			m_seed(other.m_seed)
+	_craft_perlin_2d::_craft_perlin_2d(void) :
+		m_initialized(false)
 	{
-		return;
+		std::atexit(craft_perlin_2d::_delete);
 	}
 
 	_craft_perlin_2d::~_craft_perlin_2d(void)
 	{
-		return;
+
+		if(m_initialized) {
+			uninitialize();
+		}
 	}
 
-	_craft_perlin_2d &
-	_craft_perlin_2d::operator=(
-		__in const _craft_perlin_2d &other
-		)
+	void 
+	_craft_perlin_2d::_delete(void)
 	{
 
-		if(this != &other) {
-			m_amplitude = other.m_amplitude;
-			m_frequency = other.m_frequency;
-			m_octaves = other.m_octaves;
-			m_persistence = other.m_persistence;
-			m_seed = other.m_seed;
+		if(craft_perlin_2d::m_instance) {
+			delete craft_perlin_2d::m_instance;
+			craft_perlin_2d::m_instance = NULL;
+		}
+	}
+
+	_craft_perlin_2d *
+	_craft_perlin_2d::acquire(void)
+	{
+
+		if(!craft_perlin_2d::m_instance) {
+
+			craft_perlin_2d::m_instance = new craft_perlin_2d;
+			if(!craft_perlin_2d::m_instance) {
+				THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_ALLOCATED);
+			}
 		}
 
-		return *this;
+		return craft_perlin_2d::m_instance;
 	}
 
-	double &
-	_craft_perlin_2d::amplitude(void)
-	{
-		return m_amplitude;
-	}
-
-	double &
-	_craft_perlin_2d::frequency(void)
-	{
-		return m_frequency;
-	}
-
-	double 
+	std::vector<double> 
 	_craft_perlin_2d::generate(
-		__in const glm::vec2 &position
+		__out glm::uvec2 &dimension,
+		__in const glm::vec2 &position,
+		__in const glm::vec2 &offset,
+		__in uint32_t octaves,
+		__in double amplitude,
+		__in double persistence,
+		__in_opt bool bicubic
 		)
 	{
-		size_t iter = 0;
-		double curr_freq = m_frequency, curr_amp = 1.0, result = 0.0;
+		uint32_t iter_x, iter_y;
+		std::vector<double> result;
+		double amplitude_total = 0.0;
+		std::vector<std::vector<double>> noise;
+		std::vector<double>::iterator iter_result;
+		std::vector<std::vector<double>>::reverse_iterator iter_noise;
 
-		for(; iter < m_octaves; ++iter) {
-			result += generate_value({position.x * curr_freq + m_seed, 
-				position.y * curr_freq + m_seed}) * curr_amp;
-			curr_amp *= m_persistence;
-			curr_freq *= PERLIN_FREQ_SCALE;
+		if(!m_initialized) {
+			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_UNINITIALIZED);
 		}
 
-		return result * m_amplitude;
+		if(position.x < offset.x) {
+			dimension.x = std::abs(offset.x - position.x);
+		} else {
+			dimension.x = std::abs(position.x - offset.x);
+		}
+
+		if(position.y < offset.y) {
+			dimension.y = std::abs(offset.y - position.y);
+		} else {
+			dimension.y = std::abs(position.y - offset.y);
+		}
+
+		result.resize(dimension.x * dimension.y, 0.0);
+		generate_noise(noise, dimension, position, octaves, bicubic);
+
+		if(!noise.empty()) {
+
+			for(iter_noise = noise.rbegin(); iter_noise != noise.rend(); 
+					++iter_noise) {
+				amplitude *= persistence;
+				amplitude_total += amplitude;
+
+				for(iter_x = 0; iter_x < dimension.x; ++iter_x) {
+
+					for(iter_y = 0; iter_y < dimension.y; ++iter_y) {
+						result.at(SCALAR_INDEX_2D(iter_x, iter_y, dimension.x))
+							+= (iter_noise->at(SCALAR_INDEX_2D(iter_x, iter_y, dimension.x)) 
+							* amplitude);
+					}
+				}
+			}
+
+			for(iter_result = result.begin(); iter_result != result.end(); 
+					++iter_result) {
+				*iter_result /= amplitude_total;
+			}
+		}
+
+		return result;
 	}
 
-	double 
-	_craft_perlin_2d::generate_interpolation(
-		__in const glm::vec3 &value
-		)
-	{
-		double z = (value.z * value.z), z_prime = (1.0 - value.z);
-
-		z_prime *= z_prime;
-
-		return ((value.x * ((3.0 * z_prime) - (2.0 * (z_prime * z)))) 
-			+ (value.y * ((3.0 * z) - (2.0 * (z * value.z)))));
-	}
-
-	double 
+	void 
 	_craft_perlin_2d::generate_noise(
-		__in const glm::vec2 &value
+		__out std::vector<std::vector<double>> &noise,
+		__in const glm::uvec2 &dimension,
+		__in const glm::vec2 &position,
+		__in uint32_t octaves,
+		__in_opt bool bicubic
 		)
 	{
-		return glm::perlin(value);
+		craft_random *inst = NULL;
+		std::vector<double> rough, smooth;
+		std::vector<double>::iterator iter;
+		double alpha_x, alpha_y, blend_bottom, blend_top, frequency;
+		uint32_t iter_oct = 0, iter_x, iter_y, period, sample_x0, sample_x1, sample_y0, sample_y1;
+
+		if(!m_initialized) {
+			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_UNINITIALIZED);
+		}
+
+		noise.clear();
+		inst = craft_random::acquire();
+		rough.resize(dimension.x * dimension.y, 0.0);
+
+		for(iter = rough.begin(); iter != rough.end(); ++iter) {
+
+			// TODO: generate based off position + seed
+			*iter = inst->generate_float();
+			// ---
+		}
+
+		for(; iter_oct < octaves; ++iter_oct) {
+			smooth.resize(dimension.x * dimension.y, 0.0);
+			period = (1 << iter_oct);
+			frequency = (1.0 / period);
+
+			for(iter_x = 0; iter_x < dimension.x; ++iter_x) {
+				sample_x0 = (iter_x / period) * period;
+				sample_x1 = (sample_x0 + period) % dimension.x;
+				alpha_x = (iter_x - sample_x0) * frequency;
+
+				for(iter_y = 0; iter_y < dimension.y; ++iter_y) {
+					sample_y0 = (iter_y / period) * period;
+					sample_y1 = (sample_y0 + period) % dimension.y;
+					alpha_y = (iter_y - sample_y0) * frequency;
+					blend_top = interpolate_noise({rough.at(SCALAR_INDEX_2D(sample_x0, sample_y0, dimension.x)),
+						rough.at(SCALAR_INDEX_2D(sample_x1, sample_y0, dimension.x)), alpha_x}, bicubic);
+					blend_bottom = interpolate_noise({rough.at(SCALAR_INDEX_2D(sample_x0, sample_y1, dimension.x)),
+						rough.at(SCALAR_INDEX_2D(sample_x1, sample_y1, dimension.x)), alpha_x}, bicubic);
+					smooth.at(SCALAR_INDEX_2D(iter_x, iter_y, dimension.x)) = interpolate_noise(
+						{blend_top, blend_bottom, alpha_y}, bicubic);
+				}
+			}
+
+			noise.push_back(smooth);
+			smooth.clear();
+		}
+	}
+
+	void 
+	_craft_perlin_2d::initialize(void)
+	{
+
+		if(m_initialized) {
+			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_INITIALIZED);
+		}
+
+		m_initialized = true;
 	}
 
 	double 
-	_craft_perlin_2d::generate_value(
-		__in const glm::vec2 &value
+	_craft_perlin_2d::interpolate_noise(
+		__in const glm::vec3 &value,
+		__in_opt bool bicubic
 		)
-	{		
-		glm::vec2 delta, interpolate, origin;
-		double sample[PERLIN_SAMPLE_COUNT] = {0.0};
+	{
+		double part, result;
 
-		std::modf(value.x, &origin.x);
-		std::modf(value.y, &origin.y);
-		delta = {value.x - origin.x, value.y - origin.y};
-		sample[0] = generate_noise({origin.x - 1.0, origin.y - 1.0});
-		sample[1] = generate_noise({origin.x + 1.0, origin.y - 1.0});
-		sample[2] = generate_noise({origin.x - 1.0, origin.y + 1.0});
-		sample[3] = generate_noise({origin.x + 1.0, origin.y + 1.0});
-		sample[4] = generate_noise({origin.x - 1.0, origin.y});
-		sample[5] = generate_noise({origin.x + 1.0, origin.y});
-		sample[6] = generate_noise({origin.x, origin.y - 1.0});
-		sample[7] = generate_noise({origin.x, origin.y + 1.0});
-		sample[8] = generate_noise({origin.x, origin.y});
-		sample[9] = generate_noise({origin.x + 2.0, origin.y - 1.0});
-		sample[10] = generate_noise({origin.x + 2.0, origin.y + 1.0});
-		sample[11] = generate_noise({origin.x + 2.0, origin.y});
-		sample[12] = generate_noise({origin.x - 1.0, origin.y + 2.0});
-		sample[13] = generate_noise({origin.x + 1.0, origin.y + 2.0});
-		sample[14] = generate_noise({origin.x, origin.y + 2.0});
-		sample[15] = generate_noise({origin.x + 2.0, origin.y + 2.0});
-		interpolate.x = generate_interpolation({
-				(PERLIN_WEIGHT_0 * (sample[0] + sample[1] + sample[2] + sample[3])) 
-				+ (PERLIN_WEIGHT_1 * (sample[4] + sample[5] + sample[6] + sample[7])) 
-				+ (PERLIN_WEIGHT_2 * sample[8]), 
-				(PERLIN_WEIGHT_0 * (sample[6] + sample[9] + sample[7] + sample[10])) 
-				+ (PERLIN_WEIGHT_1 * (sample[8] + sample[11] + sample[1] + sample[3])) 
-				+ (PERLIN_WEIGHT_2 * sample[5]), 
-				delta.x});
-		interpolate.y = generate_interpolation({
-				(PERLIN_WEIGHT_0 * (sample[4] + sample[5] + sample[12] + sample[13])) 
-				+ (PERLIN_WEIGHT_1 * (sample[2] + sample[3] + sample[8] + sample[14])) 
-				+ (PERLIN_WEIGHT_2 * sample[7]), 
-				(PERLIN_WEIGHT_0 * (sample[8] + sample[11] + sample[14] + sample[15])) 
-				+ (PERLIN_WEIGHT_1 * (sample[7] + sample[10] + sample[5] + sample[13])) 
-				+ (PERLIN_WEIGHT_2 * sample[3]), 
-				delta.x});
+		if(!m_initialized) {
+			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_UNINITIALIZED);
+		}
 
-		return generate_interpolation({interpolate.x, interpolate.y, delta.y});
+		if(bicubic) {
+			part = (1.0 - std::cos(value.z * M_PI)) * 0.5;
+			result = value.x * (1.0 - part) + value.y * part;
+		} else {
+			result = value.x * (1.0 - value.z) + value.z * value.y;
+		}
+
+		return result;
 	}
 
-	uint32_t &
-	_craft_perlin_2d::octaves(void)
+	bool 
+	_craft_perlin_2d::is_allocated(void)
 	{
-		return m_octaves;
+		return (craft_perlin_2d::m_instance != NULL);
 	}
 
-	double &
-	_craft_perlin_2d::persistence(void)
+	bool 
+	_craft_perlin_2d::is_initialized(void)
 	{
-		return m_persistence;
-	}
-
-	uint32_t &
-	_craft_perlin_2d::seed(void)
-	{
-		return m_seed;
+		return m_initialized;
 	}
 
 	void 
 	_craft_perlin_2d::to_file(
 		__in const std::string &path,
-		__in const glm::vec2 &origin,
+		__in const std::vector<double> &noise,
 		__in const glm::uvec2 &dimension,
 		__in_opt bool colorize
 		)
 	{
 		std::stringstream stream;
-		double iter_x, iter_y, normalized;
+		double normalized, scale;
+		uint32_t iter_x, iter_y = 0;
 
 		std::ofstream file(path.c_str(), std::ios::out);
 		if(!file) {
@@ -215,36 +257,38 @@ namespace CRAFT {
 		stream << dimension.x << " " << dimension.y << std::endl;
 
 		if(colorize) {
-			stream << 255 << std::endl;
+			stream << PERLIN_SCALE_COLOR << std::endl;
+			scale = (PERLIN_SCALE_COLOR * 1.0);
 		} else {
-			stream << 128 << std::endl;
+			stream << PERLIN_SCALE_GREYSCALE << std::endl;
+			scale = (PERLIN_SCALE_GREYSCALE * 1.0);
 		}
 
-		for(iter_y = 0.0; iter_y < dimension.y; ++iter_y) {
+		for(; iter_y < dimension.y; ++iter_y) {
 
-			for(iter_x = 0.0; iter_x < dimension.x; ++iter_x) {
+			for(iter_x = 0; iter_x < dimension.x; ++iter_x) {
 
 				if(iter_x > 0) {
 					stream << " ";
 				}
 
-				normalized = generate_value({iter_x, iter_y});
+				normalized = noise.at(SCALAR_INDEX_2D(iter_x, iter_y, dimension.x));
 
 				if(colorize) {
 
 					if((normalized >= 0.0) && (normalized < 0.3)) {
-						stream << "0 0 " << (uint32_t) (255.0 * (normalized / 0.3));
+						stream << "0 0 " << (uint32_t) (scale * (normalized / 0.3));
 					} else if((normalized >= 0.3) && (normalized < 0.4)) {
-						stream << "0 " << (uint32_t) (255.0 * ((normalized - 0.3) / 0.1)) << " 255";
+						stream << "0 " << (uint32_t) (scale * ((normalized - 0.3) / 0.1)) << " 255";
 					} else if((normalized >= 0.4) && (normalized < 0.6)) {
-						stream << "0 255 " << (255.0 - (uint32_t) (255.0 * ((normalized - 0.4) / 0.2)));
+						stream << "0 255 " << (uint32_t) (scale - (scale * ((normalized - 0.4) / 0.2)));
 					} else if((normalized >= 0.6) && (normalized < 0.7)) {
-						stream << (uint32_t) (255.0 * ((normalized - 0.6) / 0.1)) << " 255 0";
+						stream << (uint32_t) (scale * ((normalized - 0.6) / 0.1)) << " 255 0";
 					} else {
-						stream << " 255 " << (255.0 - (uint32_t) (255.0 * ((normalized - 0.7) / 0.3))) << " 0";
+						stream << " 255 " << (uint32_t) (scale - (scale * ((normalized - 0.7) / 0.3))) << " 0";
 					}
 				} else {
-					stream << (uint32_t) (128.0 * normalized);
+					stream << (uint32_t) (scale * normalized);
 				}
 			}
 
@@ -262,17 +306,33 @@ namespace CRAFT {
 	{
 		std::stringstream result;
 
-		result << CRAFT_PERLIN_HEADER << " (SEED. 0x" << SCALAR_AS_HEX(uint32_t, m_seed) 
-			<< ", AMP. " << m_amplitude << ", FREQ. " << m_frequency 
-			<< ", OCT. " << m_octaves << ", PER. " << m_persistence << ")";
+		result << CRAFT_PERLIN_2D_HEADER << " (" << (m_initialized ? "INITIALIZED" : "UNINITIALIZED");
+
+		if(verbose) {
+			result << ", PTR. 0x" << SCALAR_AS_HEX(craft_perlin_2d *, this);
+		}
+
+		result << ")";
 
 		return result.str();
+	}
+
+	void 
+	_craft_perlin_2d::uninitialize(void)
+	{
+
+		if(!m_initialized) {
+			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_UNINITIALIZED);
+		}
+
+		m_initialized = false;
 	}
 
 	_craft_random *_craft_random::m_instance = NULL;
 
 	_craft_random::_craft_random(void) :
 		m_initialized(false),
+		m_instance_perlin_2d(craft_perlin_2d::acquire()),
 		m_seed(0)
 	{
 		std::atexit(craft_random::_delete);
@@ -311,25 +371,6 @@ namespace CRAFT {
 		return craft_random::m_instance;
 	}
 
-	int32_t 
-	_craft_random::generate_signed(
-		__in_opt int32_t min,
-		__in_opt int32_t max
-		)
-	{
-
-		if(!m_initialized) {
-			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_UNINITIALIZED);
-		}
-
-		if(min >= max) {
-			THROW_CRAFT_RANDOM_EXCEPTION_FORMAT(CRAFT_RANDOM_EXCEPTION_INVALID_RANGE,
-				"{%ls - %ls} (min >= max)", min, max);
-		}
-
-		return std::uniform_int_distribution<int32_t>(min, max)(m_engine);
-	}
-
 	double 
 	_craft_random::generate_float(
 		__in_opt double min,
@@ -347,6 +388,45 @@ namespace CRAFT {
 		}
 
 		return std::uniform_real_distribution<double>(min, max)(m_engine);
+	}
+
+	std::vector<double> 
+	_craft_random::generate_perlin_2d(
+		__out glm::uvec2 &dimension,
+		__in const glm::vec2 &position,
+		__in const glm::vec2 &offset,
+		__in uint32_t octaves,
+		__in double amplitude,
+		__in double persistence,
+		__in_opt bool bicubic
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_UNINITIALIZED);
+		}
+
+		return m_instance_perlin_2d->generate(dimension, position, offset, octaves, 
+			amplitude, persistence, bicubic);
+	}
+
+	int32_t 
+	_craft_random::generate_signed(
+		__in_opt int32_t min,
+		__in_opt int32_t max
+		)
+	{
+
+		if(!m_initialized) {
+			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_UNINITIALIZED);
+		}
+
+		if(min >= max) {
+			THROW_CRAFT_RANDOM_EXCEPTION_FORMAT(CRAFT_RANDOM_EXCEPTION_INVALID_RANGE,
+				"{%ls - %ls} (min >= max)", min, max);
+		}
+
+		return std::uniform_int_distribution<int32_t>(min, max)(m_engine);
 	}
 
 	uint32_t 
@@ -381,6 +461,7 @@ namespace CRAFT {
 		m_initialized = true;
 		m_seed = seed;
 		reset();
+		m_instance_perlin_2d->initialize();
 	}
 
 	bool 
@@ -443,6 +524,7 @@ namespace CRAFT {
 			THROW_CRAFT_RANDOM_EXCEPTION(CRAFT_RANDOM_EXCEPTION_UNINITIALIZED);
 		}
 
+		m_instance_perlin_2d->uninitialize();
 		m_seed = 0;
 		reset();
 		m_initialized = false;
