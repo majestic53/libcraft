@@ -19,9 +19,9 @@
 
 #include "../lib/include/craft.h"
 
-#define TEST_FULLSCREEN true
-#define TEST_WIDTH 1920
-#define TEST_HEIGHT 1080
+#define TEST_FULLSCREEN false
+#define TEST_WIDTH 1024
+#define TEST_HEIGHT 768
 
 #define TEST_SEED 0xdeadbeef
 

@@ -229,11 +229,26 @@ namespace CRAFT {
 			reset();
 
 			// TODO: DEBUG
+			double scale = 512;
+			uint32_t count = 1;
 			glm::uvec2 dimension;
-			glm::vec2 position = {0.0, 0.0}, offset = {256.0, 256.0};
-			std::vector<double> noise = craft_perlin_2d::acquire()->generate(dimension, position, offset, 
-				6, 5.0, 0.3, true);
-			craft_perlin_2d::acquire()->to_file("./test.pbm", noise, dimension, true);
+			std::stringstream path;
+			size_t iter_x = 0, iter_y;
+
+			for(; iter_x < count; ++iter_x) {
+
+				for(iter_y = 0; iter_y < count; ++iter_y) {
+					path.clear();
+					path.str(std::string());
+					path << "./test_" << iter_x << "_" << iter_y << ".pbm";
+					glm::vec2 position = {iter_x * scale, iter_y * scale}, 
+						offset = {position.x + scale, position.y + scale};
+					std::vector<double> noise = craft_perlin_2d::acquire()->generate(
+						dimension, position, offset, 6, 5.0, 0.3, true);
+					craft_perlin_2d::acquire()->to_file(path.str().c_str(), 
+						noise, dimension, true);
+				}
+			}
 			// ---
 		}
 

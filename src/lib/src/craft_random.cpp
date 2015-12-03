@@ -112,8 +112,8 @@ namespace CRAFT {
 
 					for(iter_y = 0; iter_y < dimension.y; ++iter_y) {
 						result.at(SCALAR_INDEX_2D(iter_x, iter_y, dimension.x))
-							+= (iter_noise->at(SCALAR_INDEX_2D(iter_x, iter_y, dimension.x)) 
-							* amplitude);
+							+= std::abs((iter_noise->at(SCALAR_INDEX_2D(iter_x, iter_y, dimension.x)) 
+							* amplitude));
 					}
 				}
 			}
@@ -138,7 +138,6 @@ namespace CRAFT {
 	{
 		craft_random *inst = NULL;
 		std::vector<double> rough, smooth;
-		std::vector<double>::iterator iter;
 		double alpha_x, alpha_y, blend_bottom, blend_top, frequency;
 		uint32_t iter_oct = 0, iter_x, iter_y, period, sample_x0, sample_x1, sample_y0, sample_y1;
 
@@ -150,11 +149,13 @@ namespace CRAFT {
 		inst = craft_random::acquire();
 		rough.resize(dimension.x * dimension.y, 0.0);
 
-		for(iter = rough.begin(); iter != rough.end(); ++iter) {
+		
 
-			// TODO: generate based off position + seed
-			*iter = inst->generate_float();
-			// ---
+		for(iter_x = 0; iter_x < dimension.x; ++iter_x) {
+
+			for(iter_y = 0; iter_y < dimension.y; ++iter_y) {
+				rough.at(SCALAR_INDEX_2D(iter_x, iter_y, dimension.x)) = inst->generate_float();
+			}
 		}
 
 		for(; iter_oct < octaves; ++iter_oct) {
@@ -238,8 +239,8 @@ namespace CRAFT {
 		__in_opt bool colorize
 		)
 	{
+		double value;
 		std::stringstream stream;
-		double normalized, scale;
 		uint32_t iter_x, iter_y = 0;
 
 		std::ofstream file(path.c_str(), std::ios::out);
@@ -258,10 +259,8 @@ namespace CRAFT {
 
 		if(colorize) {
 			stream << PERLIN_SCALE_COLOR << std::endl;
-			scale = (PERLIN_SCALE_COLOR * 1.0);
 		} else {
 			stream << PERLIN_SCALE_GREYSCALE << std::endl;
-			scale = (PERLIN_SCALE_GREYSCALE * 1.0);
 		}
 
 		for(; iter_y < dimension.y; ++iter_y) {
@@ -272,23 +271,49 @@ namespace CRAFT {
 					stream << " ";
 				}
 
-				normalized = noise.at(SCALAR_INDEX_2D(iter_x, iter_y, dimension.x));
+				value = noise.at(SCALAR_INDEX_2D(iter_x, iter_y, dimension.x));
 
 				if(colorize) {
 
-					if((normalized >= 0.0) && (normalized < 0.3)) {
-						stream << "0 0 " << (uint32_t) (scale * (normalized / 0.3));
-					} else if((normalized >= 0.3) && (normalized < 0.4)) {
-						stream << "0 " << (uint32_t) (scale * ((normalized - 0.3) / 0.1)) << " 255";
-					} else if((normalized >= 0.4) && (normalized < 0.6)) {
-						stream << "0 255 " << (uint32_t) (scale - (scale * ((normalized - 0.4) / 0.2)));
-					} else if((normalized >= 0.6) && (normalized < 0.7)) {
-						stream << (uint32_t) (scale * ((normalized - 0.6) / 0.1)) << " 255 0";
+					/**
+					 * Height-map gradient
+					 * ------------------
+					 * 0		{0, 0, 125}
+					 * 0.25		{0, 0, 255}
+					 * 0.4		{0, 125, 255}
+					 * 0.4625	{225, 230, 75}
+					 * 0.485	{32, 160, 0}
+					 * 0.6		{220, 220, 0}
+					 * 0.75		{130, 130, 130}
+					 * 1		{255, 255, 255}
+					 */
+
+					if(value < 0.25) {
+						stream << "0 0 " << (uint32_t) (((255.0 - 125.0) * (value / 0.25)) + 125.0);
+					} else if(value < 0.4) {
+						stream << "0 " << (uint32_t) (125.0 * ((value - 0.25) / 0.15)) << " 255";
+					} else if(value < 0.4625) {
+						stream << (uint32_t) (225.0 * ((value - 0.4) / 0.0625)) <<  " " 
+							<< (uint32_t) (((230.0 - 125.0) * ((value - 0.4) / 0.0625)) + 125.0) << " "
+							<< (uint32_t) (255.0 - ((255.0 - 75.0) * ((value - 0.4) / 0.0625)));
+					} else if(value < 0.485) {
+						stream << (uint32_t) (225.0 - ((225.0 - 32.0) * ((value - 0.4625) / 0.0225))) << " "
+							<< (uint32_t) (230.0 - ((230.0 - 160.0) * ((value - 0.4625) / 0.0225))) << " "
+							<< (uint32_t) (75.0 - (75.0 * ((value - 0.4625) / 0.0225)));
+					} else if(value < 0.6) {
+						stream << (uint32_t) (((255.0 - 220.0) * ((value - 0.485) / 0.115)) + 32.0) << " "
+							<< (uint32_t) (((255.0 - 220.0) * ((value - 0.485) / 0.115)) + 160.0) << " 0";
+					} else if(value < 0.75) {
+						stream << (uint32_t) (220.0 - ((220.0 - 130.0) * ((value - 0.6) / 0.15))) << " "
+							<< (uint32_t) (220.0 - ((220.0 - 130.0) * ((value - 0.6) / 0.15))) << " "
+							<< (uint32_t) (130.0 * ((value - 0.6) / 0.15));
 					} else {
-						stream << " 255 " << (uint32_t) (scale - (scale * ((normalized - 0.7) / 0.3))) << " 0";
+						stream << (uint32_t) (((255.0 - 130.0) * ((value - 0.75) / 0.25)) + 130.0) << " "
+							<< (uint32_t) (((255.0 - 130.0) * ((value - 0.75) / 0.25)) + 130.0) << " "
+							<< (uint32_t) (((255.0 - 130.0) * ((value - 0.75) / 0.25)) + 130.0);
 					}
 				} else {
-					stream << (uint32_t) (scale * normalized);
+					stream << (uint32_t) (PERLIN_SCALE_GREYSCALE * value);
 				}
 			}
 
