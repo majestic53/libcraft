@@ -15,6 +15,7 @@ Changelog
 *Updated:12/1-2/2015*
 
 * Updated perlin noise algorithm:
+
 ![Terrain Sample](https://raw.githubusercontent.com/majestic53/libcraft/master/docs/terrain_sample.jpg)
 
 ##Version 0.1.1548
