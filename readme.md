@@ -12,6 +12,10 @@ Table of Contents
 Changelog
 =========
 ##Version 0.1.1549
+*Updated:12/3/2015*
+
+* Added chunk class (parital)
+
 *Updated:12/1-2/2015*
 
 * Updated perlin noise algorithm:
