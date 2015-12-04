@@ -45,6 +45,7 @@ using namespace CRAFT::TEST;
 #define COMPONENT component
 #endif // COMPONENT
 
+#include "craft_chunk.h"
 #include "craft_display.h"
 #include "craft_keyboard.h"
 #include "craft_mouse.h"

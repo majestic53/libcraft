@@ -95,7 +95,7 @@ namespace CRAFT {
 	#define RESOLUTION_BUFFER 20
 
 	#define SCALAR_INDEX_2D(_X_, _Y_, _W_) (((_W_) * (_Y_)) + (_X_))
-
+	#define SCALAR_INDEX_3D(_X_, _Y_, _Z_, _V_, _W_) (((_V_) * (_Z_)) + ((((_W_) * (_Y_)) + (_X_))))
 	#define SCALAR_INVALID(_TYPE_) ((_TYPE_) -1)
 
 	#define SCALAR_AS_HEX(_TYPE_, _VAL_) \
@@ -112,7 +112,7 @@ namespace CRAFT {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 3
+	#define VERSION_REVISION 4
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) \
 		"." STRING_CONCAT(VERSION_TICK) "." STRING_CONCAT(VERSION_REVISION)
