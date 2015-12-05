@@ -65,6 +65,8 @@ namespace CRAFT {
 
 				glm::vec3 dimension(void);
 
+				bool has_changed(void);
+
 				uint8_t height_at(
 					__in const glm::vec2 &position
 					);
@@ -75,6 +77,8 @@ namespace CRAFT {
 
 				glm::vec2 position(void);
 
+				void render(void);
+
 				void set(
 					__in const glm::vec3 &position,
 					__in craft_block type
@@ -82,11 +86,16 @@ namespace CRAFT {
 
 				static void to_file(
 					__in const std::string &path,
-					__in const _craft_chunk &chunk
+					__in const _craft_chunk &chunk,
+					__in_opt bool vertical = false
 					);
 
 				virtual std::string to_string(
 					__in_opt bool verbose = false
+					);
+
+				void update(
+					__in GLfloat delta
 					);
 
 			protected:
@@ -116,6 +125,8 @@ namespace CRAFT {
 					);
 
 				std::vector<uint8_t> m_block;
+
+				bool m_changed;
 
 				glm::vec3 m_dimension;
 

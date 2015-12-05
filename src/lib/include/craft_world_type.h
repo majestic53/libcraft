@@ -34,6 +34,7 @@ namespace CRAFT {
 		enum {
 			CRAFT_WORLD_EXCEPTION_ALLOCATED = 0,
 			CRAFT_WORLD_EXCEPTION_INITIALIZED,
+			CRAFT_WORLD_EXCEPTION_INVALID_DIMENSION,
 			CRAFT_WORLD_EXCEPTION_UNINITIALIZED,
 		};
 
@@ -42,6 +43,7 @@ namespace CRAFT {
 		static const std::string CRAFT_WORLD_EXCEPTION_STR[] = {
 			CRAFT_WORLD_EXCEPTION_HEADER " Failed to allocate world component",
 			CRAFT_WORLD_EXCEPTION_HEADER " World component initialized",
+			CRAFT_WORLD_EXCEPTION_HEADER " Invalid dimension",
 			CRAFT_WORLD_EXCEPTION_HEADER " World component uninitialized",
 			};
 

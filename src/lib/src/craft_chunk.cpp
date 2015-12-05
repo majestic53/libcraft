@@ -29,7 +29,8 @@ namespace CRAFT {
 			__in const glm::vec2 &position,
 			__in const glm::vec3 &dimension,
 			__in const std::vector<uint8_t> &height
-			)
+			) :
+				m_changed(true)
 		{
 			initialize(position, dimension, height);
 		}
@@ -38,6 +39,7 @@ namespace CRAFT {
 			__in const _craft_chunk &other
 			) :
 				m_block(other.m_block),
+				m_changed(other.m_changed),
 				m_dimension(other.m_dimension),
 				m_height(other.m_height),
 				m_position(other.m_position)
@@ -58,6 +60,7 @@ namespace CRAFT {
 
 			if(this != &other) {
 				m_block = other.m_block;
+				m_changed = other.m_changed;
 				m_dimension = other.m_dimension;
 				m_height = other.m_height;
 				m_position = other.m_position;
@@ -72,6 +75,12 @@ namespace CRAFT {
 			)
 		{
 			return (craft_block) *find_block(position);
+		}
+
+		bool 
+		_craft_chunk::has_changed(void)
+		{
+			return m_changed;
 		}
 
 		glm::vec3 
@@ -141,9 +150,9 @@ namespace CRAFT {
 							set(iter, CRAFT_BLOCK_DIRT);
 						}
 
-						std::cout << "{" << iter.x << ", " << iter.y << ", " << iter.z 
+						/*std::cout << "{" << iter.x << ", " << iter.y << ", " << iter.z 
 							<< "} HEIGHT: " << iter.y << ", TYPE: 0x" 
-							<< SCALAR_AS_HEX(craft_block, at(iter)) << std::endl;
+							<< SCALAR_AS_HEX(craft_block, at(iter)) << std::endl;*/
 						// ---
 					}
 				}
@@ -219,6 +228,17 @@ namespace CRAFT {
 		}
 
 		void 
+		_craft_chunk::render(void)
+		{
+
+			if(m_changed) {
+				m_changed = false;
+
+				// TODO: render chunk
+			}
+		}
+
+		void 
 		_craft_chunk::set(
 			__in const glm::vec3 &position,
 			__in craft_block type
@@ -240,12 +260,15 @@ namespace CRAFT {
 				pos.y -= 1.0;
 				*iter = (*iter - 1);
 			}
+
+			m_changed = true;
 		}
 
 		void 
 		_craft_chunk::to_file(
 			__in const std::string &path,
-			__in const _craft_chunk &chunk
+			__in const _craft_chunk &chunk,
+			__in_opt bool vertical
 			)
 		{
 			// TODO
@@ -269,6 +292,14 @@ namespace CRAFT {
 			result << ")";
 
 			return result.str();
+		}
+
+		void 
+		_craft_chunk::update(
+			__in GLfloat delta
+			)
+		{
+			// TODO: add chunk logic (falling blocks, etc.)
 		}
 	}
 }

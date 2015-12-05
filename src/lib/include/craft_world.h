@@ -24,6 +24,20 @@ namespace CRAFT {
 
 	namespace COMPONENT {
 
+		typedef class _craft_position_key {
+
+			public:
+
+				size_t operator()(
+					__in const glm::vec2 &position
+					) const;
+
+				bool operator()(
+					__in const glm::vec2 &left,
+					__in const glm::vec2 &right
+					) const;
+		} craft_position_key;
+
 		typedef class _craft_world {
 
 			public:
@@ -35,7 +49,12 @@ namespace CRAFT {
 				void clear(void);
 
 				void initialize(
-					__in uint32_t seed
+					__in uint32_t seed,
+					__in double dimension,
+					__in uint32_t octaves,
+					__in double amplitude,
+					__in double persistence,
+					__in_opt bool bicubic = true
 					);
 
 				static bool is_allocated(void);
@@ -97,10 +116,20 @@ namespace CRAFT {
 				static void _delete(void);
 
 				void setup(
-					__in uint32_t seed
+					__in uint32_t seed,
+					__in double dimension,
+					__in uint32_t octaves,
+					__in double amplitude,
+					__in double persistence,
+					__in_opt bool bicubic = true
 					);
 
 				void teardown(void);
+
+				std::unordered_map<glm::vec2, craft_chunk, craft_position_key, 
+					craft_position_key> m_chunk_map;
+
+				std::vector<double> m_height_list;
 
 				bool m_initialized;
 

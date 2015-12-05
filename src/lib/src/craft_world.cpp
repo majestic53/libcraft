@@ -24,6 +24,29 @@ namespace CRAFT {
 
 	namespace COMPONENT {
 
+		size_t 
+		_craft_position_key::operator()(
+			__in const glm::vec2 &position
+			) const
+		{
+			return std::hash<double>()(position.x) ^ std::hash<double>()(position.y);
+		}
+
+		bool 
+		_craft_position_key::operator()(
+			__in const glm::vec2 &left,
+			__in const glm::vec2 &right
+			) const
+		{
+			bool result = (&left == &right);
+
+			if(!result) {
+				result = ((left.x == right.x) && (left.y == right.y));
+			}
+
+			return result;
+		}
+
 		_craft_world *_craft_world::m_instance = NULL;
 
 		_craft_world::_craft_world(void) :
@@ -82,12 +105,19 @@ namespace CRAFT {
 			m_instance_camera->clear();
 			m_instance_keyboard->clear();
 			m_instance_mouse->clear();
+			m_height_list.clear();
+			m_chunk_map.clear();
 			m_window = NULL;
 		}
 
 		void 
 		_craft_world::initialize(
-			__in uint32_t seed
+			__in uint32_t seed,
+			__in double dimension,
+			__in uint32_t octaves,
+			__in double amplitude,
+			__in double persistence,
+			__in_opt bool bicubic
 			)
 		{
 
@@ -97,7 +127,7 @@ namespace CRAFT {
 
 			m_initialized = true;
 			m_window = craft_display::acquire()->window();
-			setup(seed);
+			setup(seed, dimension, octaves, amplitude, persistence, bicubic);
 		}
 
 		bool 
@@ -184,7 +214,7 @@ namespace CRAFT {
 				THROW_CRAFT_WORLD_EXCEPTION(CRAFT_WORLD_EXCEPTION_UNINITIALIZED);
 			}
 
-			glClearColor(0.f, 0.f, 0.f, 1.f);
+			glClearColor(BACKGROUND_COLOR.x, BACKGROUND_COLOR.y, BACKGROUND_COLOR.z, 1.f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			// TODO: render world
@@ -211,13 +241,29 @@ namespace CRAFT {
 
 		void 
 		_craft_world::setup(
-			__in uint32_t seed
+			__in uint32_t seed,
+			__in double dimension,
+			__in uint32_t octaves,
+			__in double amplitude,
+			__in double persistence,
+			__in_opt bool bicubic
 			)
 		{
+			glm::vec3 volume;
+			glm::uvec2 result;
 			int height = 0, width = 0;
+			uint32_t center, count = 1;
+			std::vector<uint8_t> heights;
+			glm::vec2 offset, position, position_offset;
+			size_t iter_x, iter_y, iter_height_x, iter_height_y;
 
 			if(!m_initialized) {
 				THROW_CRAFT_WORLD_EXCEPTION(CRAFT_WORLD_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(std::fmod(dimension, CHUNK_WIDTH)) {
+				THROW_CRAFT_WORLD_EXCEPTION_FORMAT(CRAFT_WORLD_EXCEPTION_INVALID_DIMENSION,
+					"%lu (must be divisible by %lu)", dimension, CHUNK_WIDTH);
 			}
 
 			m_instance_random->initialize(seed);
@@ -229,27 +275,56 @@ namespace CRAFT {
 			reset();
 
 			// TODO: DEBUG
-			double scale = 512;
-			uint32_t count = 1;
-			glm::uvec2 dimension;
 			std::stringstream path;
-			size_t iter_x = 0, iter_y;
+			// ---
 
-			for(; iter_x < count; ++iter_x) {
+			for(iter_x = PERLIN_POSITION.x; iter_x < (PERLIN_POSITION.x + count); ++iter_x) {
 
-				for(iter_y = 0; iter_y < count; ++iter_y) {
+				for(iter_y = PERLIN_POSITION.y; iter_y < (PERLIN_POSITION.y + count); ++iter_y) {
+
+					// TODO: DEBUG
 					path.clear();
 					path.str(std::string());
 					path << "./test_" << iter_x << "_" << iter_y << ".pbm";
-					glm::vec2 position = {iter_x * scale, iter_y * scale}, 
-						offset = {position.x + scale, position.y + scale};
-					std::vector<double> noise = craft_perlin_2d::acquire()->generate(
-						dimension, position, offset, 6, 5.0, 0.3, true);
+					// ---
+
+					position = {iter_x * dimension, iter_y * dimension};
+					offset = {position.x + dimension, position.y + dimension};
+					m_height_list = craft_perlin_2d::acquire()->generate(result, position, 
+						offset, octaves, amplitude, persistence, bicubic);
+
+					// TODO: DEBUG
 					craft_perlin_2d::acquire()->to_file(path.str().c_str(), 
-						noise, dimension, true);
+						m_height_list, result, true);
+					// ---
 				}
 			}
-			// ---
+
+			center = (dimension / 2);
+			count = (dimension / CHUNK_WIDTH);
+			volume = glm::vec3{CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_WIDTH};
+
+			for(iter_x = 0; iter_x < count; ++iter_x) {
+
+				for(iter_y = 0; iter_y < count; ++iter_y) {
+					position = glm::vec2{iter_x, iter_y};
+					position_offset = glm::vec2{iter_x - center, iter_y - center};
+					heights.clear();
+					heights.resize(CHUNK_WIDTH * CHUNK_WIDTH, 0);
+
+					for(iter_height_x = 0; iter_height_x < CHUNK_WIDTH; ++iter_height_x) {
+
+						for(iter_height_y = 0; iter_height_y < CHUNK_WIDTH; ++iter_height_y) {
+								heights.at(SCALAR_INDEX_2D(iter_height_x, iter_height_y, CHUNK_WIDTH))
+									= (m_height_list.at(SCALAR_INDEX_2D(iter_height_x + position.x, 
+										iter_height_y + position.y, CHUNK_WIDTH)) * CHUNK_HEIGHT);
+						}
+					}
+
+					m_chunk_map.insert(std::pair<glm::vec2, craft_chunk>(position_offset, 
+						craft_chunk(position, volume, heights)));
+				}
+			}
 		}
 
 		void 

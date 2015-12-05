@@ -76,7 +76,12 @@ namespace CRAFT {
 				__in uint32_t seed,
 				__in bool fullscreen,
 				__in_opt size_t width = WINDOW_WIDTH_MIN,
-				__in_opt size_t height = WINDOW_HEIGHT_MIN
+				__in_opt size_t height = WINDOW_HEIGHT_MIN,
+				__in_opt double dimension = PERLIN_DIMENSION,
+				__in_opt uint32_t octaves = PERLIN_OCTAVES,
+				__in_opt double amplitude = PERLIN_AMPLITUDE,
+				__in_opt double persistence = PERLIN_PERSISTENCE,
+				__in_opt bool bicubic = PERLIN_BICUBIC
 				);
 
 			void stop(void);
@@ -111,14 +116,24 @@ namespace CRAFT {
 				__in uint32_t seed,
 				__in bool fullscreen,
 				__in_opt size_t width = WINDOW_WIDTH_MIN,
-				__in_opt size_t height = WINDOW_HEIGHT_MIN
+				__in_opt size_t height = WINDOW_HEIGHT_MIN,
+				__in_opt double dimension = PERLIN_DIMENSION,
+				__in_opt uint32_t octaves = PERLIN_OCTAVES,
+				__in_opt double amplitude = PERLIN_AMPLITUDE,
+				__in_opt double persistence = PERLIN_PERSISTENCE,
+				__in_opt bool bicubic = PERLIN_BICUBIC
 				);
 
 			void setup(
 				__in uint32_t seed,
 				__in bool fullscreen,
 				__in_opt size_t width = WINDOW_WIDTH_MIN,
-				__in_opt size_t height = WINDOW_HEIGHT_MIN
+				__in_opt size_t height = WINDOW_HEIGHT_MIN,
+				__in_opt double dimension = PERLIN_DIMENSION,
+				__in_opt uint32_t octaves = PERLIN_OCTAVES,
+				__in_opt double amplitude = PERLIN_AMPLITUDE,
+				__in_opt double persistence = PERLIN_PERSISTENCE,
+				__in_opt bool bicubic = PERLIN_BICUBIC
 				);
 
 			void setup_external(void);

@@ -21,12 +21,14 @@
 #define CRAFT_DEFINE_H_
 
 #include <cstdint>
+#include <functional>
 #include <iomanip>
 #include <iostream>
 #include <map>
 #include <set>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -52,6 +54,8 @@ namespace CRAFT {
 		__pragma(pack(push, 1)) typedef struct _STRUCT_ _NAME_ __pragma(pack(pop))
 #endif // _WIN32
 
+	#define BACKGROUND_COLOR glm::vec3{0.192156863, 0.301960784, 0.474509804}
+
 	#define CAMERA_FOV 45.f
 	#define CAMERA_HEIGHT 1.5f
 	#define CAMERA_PITCH 0.f
@@ -62,6 +66,9 @@ namespace CRAFT {
 	#define CAMERA_TARGET {0.f, 0.f, 0.f}
 	#define CAMERA_UP {0.f, 1.f, 0.f}
 	#define CAMERA_YAW 0.f
+
+	#define CHUNK_HEIGHT 128
+	#define CHUNK_WIDTH 16
 
 	#define DISPLAY_ACCELERATE_VISUAL 1
 	#define DISPLAY_DEPTH_SIZE 16
@@ -86,6 +93,13 @@ namespace CRAFT {
 	#define MOUSE_DEFAULT_RELATIVE true
 	#define MOUSE_DEFAULT_X 0
 	#define MOUSE_DEFAULT_Y 0
+
+	#define PERLIN_AMPLITUDE 5.0
+	#define PERLIN_DIMENSION 512
+	#define PERLIN_BICUBIC true
+	#define PERLIN_POSITION glm::vec2{0.0, 0.0}
+	#define PERLIN_OCTAVES 6
+	#define PERLIN_PERSISTENCE 0.3	
 
 	#define PERLIN_SCALE_COLOR 255
 	#define PERLIN_SCALE_GREYSCALE 128
@@ -112,7 +126,7 @@ namespace CRAFT {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 4
+	#define VERSION_REVISION 5
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) \
 		"." STRING_CONCAT(VERSION_TICK) "." STRING_CONCAT(VERSION_REVISION)

@@ -134,7 +134,12 @@ namespace CRAFT {
 		__in uint32_t seed,
 		__in bool fullscreen,
 		__in_opt size_t width,
-		__in_opt size_t height
+		__in_opt size_t height,
+		__in_opt double dimension,
+		__in_opt uint32_t octaves,
+		__in_opt double amplitude,
+		__in_opt double persistence,
+		__in_opt bool bicubic
 		)
 	{
 		SDL_Event event;
@@ -148,7 +153,8 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STARTED);
 		}
 
-		setup(seed, fullscreen, width, height);
+		setup(seed, fullscreen, width, height, dimension, octaves, amplitude, 
+			persistence, bicubic);
 		m_running = true;
 
 		while(m_running) {
@@ -194,7 +200,12 @@ namespace CRAFT {
 		__in uint32_t seed,
 		__in bool fullscreen,
 		__in_opt size_t width,
-		__in_opt size_t height
+		__in_opt size_t height,
+		__in_opt double dimension,
+		__in_opt uint32_t octaves,
+		__in_opt double amplitude,
+		__in_opt double persistence,
+		__in_opt bool bicubic
 		)
 	{
 		uint32_t flags = WINDOW_FLAGS;
@@ -215,7 +226,8 @@ namespace CRAFT {
 		m_instance_display->start(WINDOW_TITLE, WINDOW_LEFT, WINDOW_TOP, 
 			width, height, flags);
 		craft_gl::initialize_external(DISPLAY_GL_VERSION);
-		m_instance_world->initialize(seed);
+		m_instance_world->initialize(seed, dimension, octaves, amplitude, 
+			persistence, bicubic);
 	}
 
 	void 
@@ -252,7 +264,12 @@ namespace CRAFT {
 		__in uint32_t seed,
 		__in bool fullscreen,
 		__in_opt size_t width,
-		__in_opt size_t height
+		__in_opt size_t height,
+		__in_opt double dimension,
+		__in_opt uint32_t octaves,
+		__in_opt double amplitude,
+		__in_opt double persistence,
+		__in_opt bool bicubic
 		)
 	{
 
@@ -264,7 +281,8 @@ namespace CRAFT {
 			THROW_CRAFT_EXCEPTION(CRAFT_EXCEPTION_STARTED);
 		}
 
-		run(seed, fullscreen, width, height);
+		run(seed, fullscreen, width, height, dimension, octaves, amplitude, 
+			persistence, bicubic);
 	}
 
 	void 
