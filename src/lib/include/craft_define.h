@@ -98,7 +98,7 @@ namespace CRAFT {
 	#define PERLIN_BICUBIC true
 	#define PERLIN_POSITION glm::vec2{0.0, 0.0}
 	#define PERLIN_OCTAVES 6
-	#define PERLIN_PERSISTENCE 0.3	
+	#define PERLIN_PERSISTENCE 0.7
 
 	#define PERLIN_SCALE_COLOR 255
 	#define PERLIN_SCALE_GREYSCALE 128

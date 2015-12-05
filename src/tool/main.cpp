@@ -23,7 +23,7 @@
 #define TEST_WIDTH 1024
 #define TEST_HEIGHT 768
 
-#define TEST_SEED 0xdeadbeef
+#define TEST_SEED 0x100
 
 int 
 main(void) 
