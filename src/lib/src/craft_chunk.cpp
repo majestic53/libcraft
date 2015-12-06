@@ -25,6 +25,23 @@ namespace CRAFT {
 
 	namespace COMPONENT {
 
+		static const glm::uvec3 CRAFT_BLOCK_COL[] = {
+			{0, 191, 255},
+			{40, 40, 40},
+			{19, 89, 226},
+			{239, 235, 122},
+			{87, 52, 48},
+			{48, 104, 20},
+			{48, 104, 20},
+			{82, 82, 82},
+			{82, 82, 82},
+			{238, 238, 238},
+			};
+
+		#define CRAFT_BLOCK_COLOR(_TYPE_) \
+			((_TYPE_) > CRAFT_BLOCK_MAX ? CRAFT_BLOCK_COL[CRAFT_BLOCK_AIR] : \
+			CRAFT_BLOCK_COL[_TYPE_])
+
 		_craft_chunk::_craft_chunk(
 			__in const glm::vec2 &position,
 			__in const glm::vec3 &dimension,
@@ -74,7 +91,7 @@ namespace CRAFT {
 			__in const glm::vec3 &position
 			)
 		{
-			return (craft_block) *find_block(position);
+			return (craft_block) find_block(position);
 		}
 
 		bool 
@@ -89,7 +106,7 @@ namespace CRAFT {
 			return m_dimension;
 		}
 
-		std::vector<uint8_t>::iterator 
+		uint8_t &
 		_craft_chunk::find_block(
 			__in const glm::vec3 &position
 			)
@@ -100,8 +117,7 @@ namespace CRAFT {
 					"{%f, %f, %f}", position.x, position.y, position.z);
 			}
 
-			return (m_block.begin() + SCALAR_INDEX_3D(position.x, (m_dimension.y - 1.0) - position.y, 
-				position.z, m_dimension.z, m_dimension.x));
+			return m_block[position.x][position.z][position.y];
 		}
 
 		std::vector<uint8_t>::iterator 
@@ -129,9 +145,22 @@ namespace CRAFT {
 		void 
 		_craft_chunk::generate_blocks(void)
 		{
+			uint8_t height;
+			glm::uvec2 init;
+			craft_random *inst = NULL;
 			glm::ivec3 iter = {0, 0, 0};
 
-			m_block.resize(m_dimension.x * m_dimension.y * m_dimension.z, CRAFT_BLOCK_AIR);
+			m_block.resize(m_dimension.x);
+
+			for(init.x = 0; init.x < m_dimension.x; ++init.x) {
+				m_block[init.x].resize(m_dimension.z);
+
+				for(init.y = 0; init.y < m_dimension.z; ++init.y) {
+					m_block[init.x][init.y].resize(m_dimension.y, CRAFT_BLOCK_AIR);
+				}
+			}
+
+			inst = craft_random::acquire();
 
 			for(iter.y = (m_dimension.y - 1.0); iter.y >= 0; iter.y--) {
 
@@ -139,21 +168,51 @@ namespace CRAFT {
 
 					for(iter.x = 0; iter.x < m_dimension.x; ++iter.x) {
 
-						if(*find_height({iter.x, iter.z}) < iter.y) {
+						if(!iter.y) {
+							set(iter, CRAFT_BLOCK_BOUNDARY);
 							continue;
 						}
 
-						// TODO
-						if(*find_height({iter.x, iter.z}) == iter.y) {
-							set(iter, CRAFT_BLOCK_GRASS);
-						} else {
-							set(iter, CRAFT_BLOCK_DIRT);
+						height = *find_height({iter.x, iter.z});
+						if(height < iter.y) {
+
+							if(iter.y <= BLOCK_WATER_LEVEL) {
+								set(iter, CRAFT_BLOCK_WATER);
+							}
+
+							continue;
 						}
 
-						/*std::cout << "{" << iter.x << ", " << iter.y << ", " << iter.z 
-							<< "} HEIGHT: " << iter.y << ", TYPE: 0x" 
-							<< SCALAR_AS_HEX(craft_block, at(iter)) << std::endl;*/
-						// ---
+						if(height == iter.y) {
+
+							if(!height) {
+								set(iter, CRAFT_BLOCK_BOUNDARY);
+							} else if(height < BLOCK_WATER_LEVEL) {
+								set(iter, CRAFT_BLOCK_SAND);
+							} else if(height < BLOCK_GRASS_LEVEL) {
+								set(iter, CRAFT_BLOCK_GRASS_SIDE);
+							} else if(height < BLOCK_DIRT_LEVEL) {
+								set(iter, CRAFT_BLOCK_DIRT);
+							} else if(height < BLOCK_STONE_LEVEL) {
+								set(iter, CRAFT_BLOCK_STONE);
+							} else {
+								set(iter, CRAFT_BLOCK_SNOW_SIDE);
+							}
+						} else {
+
+							if(height < (iter.y + inst->generate_unsigned(
+									BLOCK_LAYER_VARIATION_MIN, 
+									BLOCK_LAYER_VARIATION_MAX))) {
+
+								if(height < BLOCK_WATER_LEVEL) {
+									set(iter, CRAFT_BLOCK_SAND);
+								} else {
+									set(iter, CRAFT_BLOCK_DIRT);
+								}
+							} else {
+								set(iter, CRAFT_BLOCK_STONE);
+							}
+						}
 					}
 				}
 			}
@@ -253,9 +312,11 @@ namespace CRAFT {
 			}
 
 			iter = find_height({position.x, position.z});
-			*find_block(position) = type;
+			find_block(position) = type;
+
 			pos = position;
 
+			
 			while((type == CRAFT_BLOCK_AIR) && (pos.y == *iter)) {
 				pos.y -= 1.0;
 				*iter = (*iter - 1);
@@ -271,7 +332,83 @@ namespace CRAFT {
 			__in_opt bool vertical
 			)
 		{
-			// TODO
+			glm::uvec3 col;
+			glm::ivec3 iter = {0, 0, 0};
+			std::stringstream output, result;
+
+			if(vertical) {
+
+				for(iter.z = 0; iter.z < chunk.m_dimension.z; ++iter.z) {
+					output.clear();
+					output.str(std::string());
+					output << path << "_" << iter.z << ".pbm";
+
+					std::fstream file(output.str().c_str(), std::ios::out);
+					if(!file) {
+						THROW_CRAFT_CHUNK_EXCEPTION_FORMAT(CRAFT_CHUNK_EXCEPTION_FILE_NOT_FOUND,
+							"%s", STRING_CHECK(output.str()));
+					}
+
+					result.clear();
+					result.str(std::string());
+					result << "P3" << std::endl << chunk.m_dimension.x << " " << chunk.m_dimension.y 
+						<< std::endl << PERLIN_SCALE_COLOR;
+
+					for(iter.y = (chunk.m_dimension.y - 1.0); iter.y >= 0; iter.y--) {
+						result << std::endl;
+
+						for(iter.x = 0; iter.x < chunk.m_dimension.x; ++iter.x) {
+
+							if(iter.x) {
+								result << " ";
+							}
+
+							col = CRAFT_BLOCK_COLOR((craft_block) 
+								chunk.m_block[iter.x][iter.z][iter.y]);
+							result << col.x << " " << col.y << " " << col.z;
+						}
+					}
+
+					file.write(result.str().c_str(), result.str().size());
+					file.close();
+				}
+			} else {
+
+				for(iter.y = (chunk.m_dimension.y - 1.0); iter.y >= 0; iter.y--) {
+					output.clear();
+					output.str(std::string());
+					output << path << "_" << iter.y << ".pbm";
+
+					std::fstream file(output.str().c_str(), std::ios::out);
+					if(!file) {
+						THROW_CRAFT_CHUNK_EXCEPTION_FORMAT(CRAFT_CHUNK_EXCEPTION_FILE_NOT_FOUND,
+							"%s", STRING_CHECK(output.str()));
+					}
+
+					result.clear();
+					result.str(std::string());
+					result << "P3" << std::endl << chunk.m_dimension.x << " " << chunk.m_dimension.z 
+						<< std::endl << PERLIN_SCALE_COLOR;
+
+					for(iter.z = 0; iter.z < chunk.m_dimension.z; ++iter.z) {
+						result << std::endl;
+
+						for(iter.x = 0; iter.x < chunk.m_dimension.x; ++iter.x) {
+
+							if(iter.x) {
+								result << " ";
+							}
+
+							col = CRAFT_BLOCK_COLOR((craft_block) 
+								chunk.m_block[iter.x][iter.z][iter.y]);
+							result << col.x << " " << col.y << " " << col.z;
+						}
+					}
+
+					file.write(result.str().c_str(), result.str().size());
+					file.close();
+				}
+			}
 		}
 
 		std::string 
@@ -300,6 +437,8 @@ namespace CRAFT {
 			)
 		{
 			// TODO: add chunk logic (falling blocks, etc.)
+
+			m_changed = true;
 		}
 	}
 }

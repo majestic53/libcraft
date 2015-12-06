@@ -12,10 +12,13 @@ Table of Contents
 Changelog
 =========
 ##Version 0.1.1549
+*Updated:12/5/2015*
+
+* Added chunk type generation algorithm
+
 *Updated:12/4/2015*
 
 * Added chunk/heightmap generation to world class
-	* Planning to move these chunks into a superblock class
 
 *Updated:12/3/2015*
 

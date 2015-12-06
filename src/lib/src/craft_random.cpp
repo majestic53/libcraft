@@ -240,13 +240,16 @@ namespace CRAFT {
 		)
 	{
 		double value;
+		std::string output;
 		std::stringstream stream;
 		uint32_t iter_x, iter_y = 0;
 
-		std::ofstream file(path.c_str(), std::ios::out);
+		output = path + ".pbm";
+
+		std::ofstream file(output.c_str(), std::ios::out);
 		if(!file) {
 			THROW_CRAFT_RANDOM_EXCEPTION_FORMAT(CRAFT_RANDOM_EXCEPTION_FILE_NOT_FOUND,
-				"%s", STRING_CHECK(path));
+				"%s", STRING_CHECK(output));
 		}
 
 		if(colorize) {

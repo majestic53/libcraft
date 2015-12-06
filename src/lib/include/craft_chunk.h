@@ -28,16 +28,16 @@ namespace CRAFT {
 			CRAFT_BLOCK_AIR = 0,
 			CRAFT_BLOCK_BOUNDARY,
 			CRAFT_BLOCK_WATER,
-			CRAFT_BLOCK_STONE,
 			CRAFT_BLOCK_SAND,
 			CRAFT_BLOCK_DIRT,
-			CRAFT_BLOCK_DIRT_SIDE,
+			CRAFT_BLOCK_GRASS_SIDE,
 			CRAFT_BLOCK_GRASS,
-			CRAFT_BLOCK_WOOD,
-			CRAFT_BLOCK_LEAVES,
+			CRAFT_BLOCK_STONE,
+			CRAFT_BLOCK_SNOW_SIDE,
+			CRAFT_BLOCK_SNOW,
 		} craft_block;
 
-		#define CRAFT_BLOCK_MAX CRAFT_BLOCK_LEAVES
+		#define CRAFT_BLOCK_MAX CRAFT_BLOCK_SNOW
 
 		typedef class _craft_chunk {
 
@@ -100,7 +100,7 @@ namespace CRAFT {
 
 			protected:
 
-				std::vector<uint8_t>::iterator find_block(
+				uint8_t &find_block(
 					__in const glm::vec3 &position
 					);
 
@@ -124,7 +124,7 @@ namespace CRAFT {
 					__in const glm::vec3 &position
 					);
 
-				std::vector<uint8_t> m_block;
+				std::vector<std::vector<std::vector<uint8_t>>> m_block;
 
 				bool m_changed;
 

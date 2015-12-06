@@ -55,6 +55,13 @@ namespace CRAFT {
 
 	#define BACKGROUND_COLOR glm::vec3{0.192156863, 0.301960784, 0.474509804}
 
+	#define BLOCK_DIRT_LEVEL 96
+	#define BLOCK_GRASS_LEVEL 63
+	#define BLOCK_LAYER_VARIATION_MAX 13
+	#define BLOCK_LAYER_VARIATION_MIN 6
+	#define BLOCK_STONE_LEVEL 109
+	#define BLOCK_WATER_LEVEL 32
+
 	#define CAMERA_FOV 45.f
 	#define CAMERA_HEIGHT 1.5f
 	#define CAMERA_PITCH 0.f
@@ -108,7 +115,6 @@ namespace CRAFT {
 	#define RESOLUTION_BUFFER 20
 
 	#define SCALAR_INDEX_2D(_X_, _Y_, _W_) (((_W_) * (_Y_)) + (_X_))
-	#define SCALAR_INDEX_3D(_X_, _Y_, _Z_, _V_, _W_) (((_V_) * (_Z_)) + ((((_W_) * (_Y_)) + (_X_))))
 	#define SCALAR_INVALID(_TYPE_) ((_TYPE_) -1)
 
 	#define SCALAR_AS_HEX(_TYPE_, _VAL_) \
@@ -125,7 +131,7 @@ namespace CRAFT {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 5
+	#define VERSION_REVISION 6
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) \
 		"." STRING_CONCAT(VERSION_TICK) "." STRING_CONCAT(VERSION_REVISION)

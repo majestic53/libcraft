@@ -281,21 +281,17 @@ namespace CRAFT {
 			for(iter_x = PERLIN_POSITION.x; iter_x < (PERLIN_POSITION.x + count); ++iter_x) {
 
 				for(iter_y = PERLIN_POSITION.y; iter_y < (PERLIN_POSITION.y + count); ++iter_y) {
-
-					// TODO: DEBUG
-					path.clear();
-					path.str(std::string());
-					path << "./test_" << iter_x << "_" << iter_y << ".pbm";
-					// ---
-
 					position = {iter_x * dimension, iter_y * dimension};
 					offset = {position.x + dimension, position.y + dimension};
 					m_height_list = craft_perlin_2d::acquire()->generate(result, position, 
 						offset, octaves, amplitude, persistence, bicubic);
 
 					// TODO: DEBUG
+					/*path.clear();
+					path.str(std::string());
+					path << "./height_map_" << iter_x << "_" << iter_y;
 					craft_perlin_2d::acquire()->to_file(path.str().c_str(), 
-						m_height_list, result, true);
+						m_height_list, result, true);*/
 					// ---
 				}
 			}
@@ -308,7 +304,7 @@ namespace CRAFT {
 
 				for(iter_y = 0; iter_y < count; ++iter_y) {
 					position = glm::vec2{iter_x, iter_y};
-					position_offset = glm::vec2{iter_x - center, iter_y - center};
+					position_offset = glm::vec2{(position.x * CHUNK_WIDTH) - center, (position.y * CHUNK_WIDTH) - center};
 					heights.clear();
 					heights.resize(CHUNK_WIDTH * CHUNK_WIDTH, 0);
 
@@ -323,6 +319,15 @@ namespace CRAFT {
 
 					m_chunk_map.insert(std::pair<glm::vec2, craft_chunk>(position_offset, 
 						craft_chunk(position, volume, heights)));
+
+					// TODO: DEBUG
+					if((iter_x == 6) && (iter_y == 6)) {
+						path.clear();
+						path.str(std::string());
+						path << "./chunk_" << iter_x << "_" << iter_y;
+						craft_chunk::to_file(path.str().c_str(), m_chunk_map.at(glm::vec2(position_offset)), true);
+					}
+					// ---
 				}
 			}
 		}
