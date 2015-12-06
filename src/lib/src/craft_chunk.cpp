@@ -117,7 +117,7 @@ namespace CRAFT {
 					"{%f, %f, %f}", position.x, position.y, position.z);
 			}
 
-			return m_block[position.x][position.z][position.y];
+			return m_block[position.x][position.y][position.z];
 		}
 
 		std::vector<uint8_t>::iterator 
@@ -153,10 +153,10 @@ namespace CRAFT {
 			m_block.resize(m_dimension.x);
 
 			for(init.x = 0; init.x < m_dimension.x; ++init.x) {
-				m_block[init.x].resize(m_dimension.z);
+				m_block[init.x].resize(m_dimension.y);
 
-				for(init.y = 0; init.y < m_dimension.z; ++init.y) {
-					m_block[init.x][init.y].resize(m_dimension.y, CRAFT_BLOCK_AIR);
+				for(init.y = 0; init.y < m_dimension.y; ++init.y) {
+					m_block[init.x][init.y].resize(m_dimension.z, CRAFT_BLOCK_AIR);
 				}
 			}
 
@@ -192,7 +192,7 @@ namespace CRAFT {
 							} else if(height < BLOCK_GRASS_LEVEL) {
 								set(iter, CRAFT_BLOCK_GRASS_SIDE);
 							} else if(height < BLOCK_DIRT_LEVEL) {
-								set(iter, CRAFT_BLOCK_DIRT);
+								set(iter, CRAFT_BLOCK_GRASS_SIDE);
 							} else if(height < BLOCK_STONE_LEVEL) {
 								set(iter, CRAFT_BLOCK_STONE);
 							} else {
@@ -313,10 +313,8 @@ namespace CRAFT {
 
 			iter = find_height({position.x, position.z});
 			find_block(position) = type;
-
 			pos = position;
 
-			
 			while((type == CRAFT_BLOCK_AIR) && (pos.y == *iter)) {
 				pos.y -= 1.0;
 				*iter = (*iter - 1);
@@ -363,8 +361,7 @@ namespace CRAFT {
 								result << " ";
 							}
 
-							col = CRAFT_BLOCK_COLOR((craft_block) 
-								chunk.m_block[iter.x][iter.z][iter.y]);
+							col = CRAFT_BLOCK_COLOR((craft_block) chunk.m_block[iter.x][iter.y][iter.z]);
 							result << col.x << " " << col.y << " " << col.z;
 						}
 					}
@@ -399,8 +396,7 @@ namespace CRAFT {
 								result << " ";
 							}
 
-							col = CRAFT_BLOCK_COLOR((craft_block) 
-								chunk.m_block[iter.x][iter.z][iter.y]);
+							col = CRAFT_BLOCK_COLOR((craft_block) chunk.m_block[iter.x][iter.y][iter.z]);
 							result << col.x << " " << col.y << " " << col.z;
 						}
 					}

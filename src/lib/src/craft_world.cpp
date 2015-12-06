@@ -278,20 +278,20 @@ namespace CRAFT {
 			std::stringstream path;
 			// ---
 
-			for(iter_x = PERLIN_POSITION.x; iter_x < (PERLIN_POSITION.x + count); ++iter_x) {
+			for(iter_y = PERLIN_POSITION.y; iter_y < (PERLIN_POSITION.y + count); ++iter_y) {
 
-				for(iter_y = PERLIN_POSITION.y; iter_y < (PERLIN_POSITION.y + count); ++iter_y) {
+				for(iter_x = PERLIN_POSITION.x; iter_x < (PERLIN_POSITION.x + count); ++iter_x) {
 					position = {iter_x * dimension, iter_y * dimension};
 					offset = {position.x + dimension, position.y + dimension};
 					m_height_list = craft_perlin_2d::acquire()->generate(result, position, 
 						offset, octaves, amplitude, persistence, bicubic);
 
 					// TODO: DEBUG
-					/*path.clear();
+					path.clear();
 					path.str(std::string());
 					path << "./height_map_" << iter_x << "_" << iter_y;
 					craft_perlin_2d::acquire()->to_file(path.str().c_str(), 
-						m_height_list, result, true);*/
+						m_height_list, result, true);
 					// ---
 				}
 			}
@@ -300,20 +300,20 @@ namespace CRAFT {
 			count = (dimension / CHUNK_WIDTH);
 			volume = glm::vec3{CHUNK_WIDTH, CHUNK_HEIGHT, CHUNK_WIDTH};
 
-			for(iter_x = 0; iter_x < count; ++iter_x) {
+			for(iter_y = 0; iter_y < count; ++iter_y) {
 
-				for(iter_y = 0; iter_y < count; ++iter_y) {
+				for(iter_x = 0; iter_x < count; ++iter_x) {
 					position = glm::vec2{iter_x, iter_y};
 					position_offset = glm::vec2{(position.x * CHUNK_WIDTH) - center, (position.y * CHUNK_WIDTH) - center};
 					heights.clear();
 					heights.resize(CHUNK_WIDTH * CHUNK_WIDTH, 0);
 
-					for(iter_height_x = 0; iter_height_x < CHUNK_WIDTH; ++iter_height_x) {
+					for(iter_height_y = 0; iter_height_y < CHUNK_WIDTH; ++iter_height_y) {
 
-						for(iter_height_y = 0; iter_height_y < CHUNK_WIDTH; ++iter_height_y) {
-								heights.at(SCALAR_INDEX_2D(iter_height_x, iter_height_y, CHUNK_WIDTH))
-									= (m_height_list.at(SCALAR_INDEX_2D(iter_height_x + position.x, 
-										iter_height_y + position.y, CHUNK_WIDTH)) * CHUNK_HEIGHT);
+						for(iter_height_x = 0; iter_height_x < CHUNK_WIDTH; ++iter_height_x) {
+							heights.at(SCALAR_INDEX_2D(iter_height_x, iter_height_y, CHUNK_WIDTH)) 
+								= (uint8_t) (m_height_list.at((((position.y * CHUNK_WIDTH) + iter_height_y) * dimension) 
+									+ ((position.x * CHUNK_WIDTH) + iter_height_x)) * CHUNK_HEIGHT);
 						}
 					}
 
@@ -321,7 +321,7 @@ namespace CRAFT {
 						craft_chunk(position, volume, heights)));
 
 					// TODO: DEBUG
-					if((iter_x == 6) && (iter_y == 6)) {
+					if((iter_x == 6) && (iter_y == 7)) {
 						path.clear();
 						path.str(std::string());
 						path << "./chunk_" << iter_x << "_" << iter_y;
