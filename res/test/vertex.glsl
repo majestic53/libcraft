@@ -19,26 +19,14 @@
 
 #version 130
 
-in vec3 position;
-
-// TEXTURE
-in vec2 in_coordinate;
+in vec3 vertex;
+in vec2 coordinate;
 varying vec2 out_coordinate;
-
-// COLOR
-//in vec3 in_color;
-//out vec3 out_color;
-
 uniform mat4 mvp;
 
 void 
 main(void)
 {	
-	gl_Position =  mvp * vec4(position, 1.f);
-	
-	// TEXTURE
-	out_coordinate = in_coordinate;
-
-	// COLOR
-	//out_color = in_color;
+	gl_Position =  mvp * vec4(vertex, 1.f);
+	out_coordinate = coordinate;
 }

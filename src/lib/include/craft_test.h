@@ -72,6 +72,10 @@ namespace CRAFT {
 
 				GLuint m_array_vertex;
 
+				GLint m_attribute_coordinate;
+
+				GLint m_attribute_vertex;
+
 				GLuint m_buffer_fragment;
 
 				GLuint m_buffer_vertex;

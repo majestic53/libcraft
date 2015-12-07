@@ -19,20 +19,11 @@
 
 #version 130
 
-// TEXTURE
 varying vec2 out_coordinate;
 uniform sampler2D texture;
-
-// COLOR
-//in vec3 out_color;
-//out vec3 color;
 
 void 
 main(void)
 {
-	// TEXTURE
 	gl_FragColor = texture2D(texture, out_coordinate);
-
-	// COLOR
-	//color = out_color;
 }
