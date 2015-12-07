@@ -287,11 +287,11 @@ namespace CRAFT {
 						offset, octaves, amplitude, persistence, bicubic);
 
 					// TODO: DEBUG
-					path.clear();
+					/*path.clear();
 					path.str(std::string());
 					path << "./height_map_" << iter_x << "_" << iter_y;
 					craft_perlin_2d::acquire()->to_file(path.str().c_str(), 
-						m_height_list, result, true);
+						m_height_list, result, true);*/
 					// ---
 				}
 			}
@@ -321,12 +321,12 @@ namespace CRAFT {
 						craft_chunk(position, volume, heights)));
 
 					// TODO: DEBUG
-					if((iter_x == 6) && (iter_y == 7)) {
+					/*if((iter_x == 6) && (iter_y == 7)) {
 						path.clear();
 						path.str(std::string());
 						path << "./chunk_" << iter_x << "_" << iter_y;
 						craft_chunk::to_file(path.str().c_str(), m_chunk_map.at(glm::vec2(position_offset)), true);
-					}
+					}*/
 					// ---
 				}
 			}

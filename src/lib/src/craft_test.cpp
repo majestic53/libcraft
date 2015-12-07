@@ -27,7 +27,55 @@ namespace CRAFT {
 		#define MVP_UNIFORM "mvp"
 		#define SHADER_FRAGMENT "./res/test/fragment.glsl"
 		#define SHADER_VERTEX "./res/test/vertex.glsl"
+		#define TEXTURE "./res/test/block.bmp"
 
+#define TEXTURED
+#ifdef TEXTURED
+		static const GLfloat data_coordinate[] = {
+			0.f, 0.f,
+			1.f, 0.f,
+			0.f, 1.f,
+			0.f, 1.f,
+			1.f, 0.f,
+			1.f, 1.f,
+
+			0.f, 0.f,
+			0.f, 1.f,
+			1.f, 0.f,
+			1.f, 0.f,
+			0.f, 1.f,
+			1.f, 1.f,
+
+			0.f, 0.f,
+			1.f, 0.f,
+			0.f, 1.f,
+			0.f, 1.f,
+			1.f, 0.f,
+			1.f, 1.f,
+
+			0.f, 0.f,
+			0.f, 1.f,
+			1.f, 0.f,
+			1.f, 0.f,
+			0.f, 1.f,
+			1.f, 1.f,
+
+			0.f, 0.f,
+			1.f, 0.f,
+			0.f, 1.f,
+			0.f, 1.f,
+			1.f, 0.f,
+			1.f, 1.f,
+
+			0.f, 0.f,
+			0.f, 1.f,
+			1.f, 0.f,
+			1.f, 0.f,
+			0.f, 1.f,
+			1.f, 1.f,
+			};
+
+#else
 		static const GLfloat color1[] = { 255, 0, 0 };
 		static const GLfloat color2[] = { 0, 255, 0 };
 		static const GLfloat color3[] = { 0, 0, 255 };
@@ -78,15 +126,19 @@ namespace CRAFT {
 			color6[0], color6[1], color6[2],
 			color6[0], color6[1], color6[2],
 			};
+#endif // TEXTURES
 
 		static const GLfloat data_vertex[] = {
+
+			// front (+z)
 			-0.5f, -0.5f, 0.5f,
 			0.5f, -0.5f, 0.5f,
 			-0.5f, 0.5f, 0.5f,
 			-0.5f, 0.5f, 0.5f,
 			0.5f, -0.5f, 0.5f,
-			0.5f, 0.5f, 0.5f, 
+			0.5f, 0.5f, 0.5f,
 
+			// back (-z)
 			-0.5f, -0.5f, -0.5f,
 			-0.5f, 0.5f, -0.5f,
 			0.5f, -0.5f, -0.5f,
@@ -94,20 +146,23 @@ namespace CRAFT {
 			-0.5f, 0.5f, -0.5f,
 			0.5f, 0.5f, -0.5f,
 
+			// right (+x)
 			0.5f, -0.5f, -0.5f, 
 			0.5f, 0.5f, -0.5f, 
 			0.5f, -0.5f, 0.5f, 
 			0.5f, -0.5f, 0.5f, 
 			0.5f, 0.5f, -0.5f, 
-			0.5f, 0.5f, 0.5f, 
+			0.5f, 0.5f, 0.5f,
 
+			// left (-x)
 			-0.5f, -0.5f, -0.5f, 
 			-0.5f, -0.5f, 0.5f, 
 			-0.5f, 0.5f, -0.5f, 
 			-0.5f, 0.5f, -0.5f, 
 			-0.5f, -0.5f, 0.5f, 
-			-0.5f, 0.5f, 0.5f, 
+			-0.5f, 0.5f, 0.5f,
 
+			// bottom (-y)
 			-0.5f, -0.5f, -0.5f,
 			0.5f, -0.5f, -0.5f,
 			-0.5f, -0.5f, 0.5f,
@@ -115,6 +170,7 @@ namespace CRAFT {
 			0.5f, -0.5f, -0.5f,
 			0.5f, -0.5f, 0.5f,
 
+			// top (+y)
 			-0.5f, 0.5f, -0.5f,
 			-0.5f, 0.5f, 0.5f,
 			0.5f, 0.5f, -0.5f,
@@ -122,6 +178,8 @@ namespace CRAFT {
 			-0.5f, 0.5f, 0.5f,
 			0.5f, 0.5f, 0.5f,
 			};
+
+		#define DATA_VERTEX_LEN 36
 
 		_craft_test *_craft_test::m_instance = NULL;
 
@@ -133,7 +191,9 @@ namespace CRAFT {
 			m_matrix(0),
 			m_program(0),
 			m_shader_fragment(0),
-			m_shader_vertex(0)
+			m_shader_vertex(0),
+			m_texture(0),
+			m_texture_uniform(0)
 		{
 			std::atexit(craft_test::_delete);
 		}
@@ -205,14 +265,18 @@ namespace CRAFT {
 				THROW_CRAFT_TEST_EXCEPTION(CRAFT_TEST_EXCEPTION_UNINITIALIZED);
 			}
 
-			glUniformMatrix4fv(m_matrix, 1, GL_FALSE, &mvp[0][0]);
+			glUniformMatrix4fv(m_matrix, 1, GL_FALSE, glm::value_ptr(mvp));
 			glEnableVertexAttribArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, m_buffer_vertex);
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 			glEnableVertexAttribArray(1);
 			glBindBuffer(GL_ARRAY_BUFFER, m_buffer_fragment);
+#ifdef TEXTURED
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+#else
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+#endif // TEXTURED
+			glDrawArrays(GL_TRIANGLES, 0, DATA_VERTEX_LEN);
 			glDisableVertexAttribArray(0);
 			glDisableVertexAttribArray(1);
 		}
@@ -227,10 +291,13 @@ namespace CRAFT {
 			}
 
 			glEnable(GL_DEPTH_TEST);
+			glEnable(GL_CULL_FACE);
 			glDepthFunc(GL_LESS);
+			glPolygonOffset(1, 1);
 			glGenVertexArrays(1, &m_array_vertex);
 			glBindVertexArray(m_array_vertex);
 			inst = craft_gl::acquire();
+			m_texture = inst->add_texture(TEXTURE);
 			m_shader_fragment = inst->add_shader(SHADER_FRAGMENT, true, GL_FRAGMENT_SHADER);
 			m_shader_vertex = inst->add_shader(SHADER_VERTEX, true, GL_VERTEX_SHADER);
 			m_program = inst->add_program(m_shader_fragment, m_shader_vertex);
@@ -240,7 +307,14 @@ namespace CRAFT {
 			glBufferData(GL_ARRAY_BUFFER, sizeof(data_vertex), data_vertex, GL_STATIC_DRAW);
 			glGenBuffers(1, &m_buffer_fragment);
 			glBindBuffer(GL_ARRAY_BUFFER, m_buffer_fragment);
+#ifdef TEXTURED
+			glBufferData(GL_ARRAY_BUFFER, sizeof(data_coordinate), data_coordinate, GL_STATIC_DRAW);
+			glActiveTexture(GL_TEXTURE0);
+			glUniform1i(m_texture_uniform, 0);
+			glBindTexture(GL_TEXTURE_2D, m_texture);
+#else
 			glBufferData(GL_ARRAY_BUFFER, sizeof(data_fragment), data_fragment, GL_STATIC_DRAW);
+#endif // TEXTURED
 			glUseProgram(m_program);
 		}
 
@@ -305,6 +379,17 @@ namespace CRAFT {
 				}
 
 				m_shader_vertex = 0;
+			}
+
+			if(m_texture) {
+
+				if(inst->contains_texture(m_texture)) {
+					inst->decrement_texture_reference(m_texture);
+				} else {
+					glDeleteTextures(1, &m_texture);
+				}
+
+				m_texture = 0;
 			}
 		}
 

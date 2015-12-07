@@ -239,6 +239,7 @@ namespace CRAFT {
 			THROW_CRAFT_GL_EXCEPTION(CRAFT_GL_EXCEPTION_UNINITIALIZED);
 		}
 
+		glActiveTexture(GL_TEXTURE0);
 		glGenTextures(1, &result);
 		glBindTexture(GL_TEXTURE_2D, result);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
@@ -247,6 +248,7 @@ namespace CRAFT {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, 
 			(uint8_t *) &source[0]);
+		glGenerateMipmap(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		m_texture_map.insert(std::pair<GLuint, std::pair<std::pair<std::pair<GLfloat, GLfloat>, GLint>, size_t>>(
 			result, std::pair<std::pair<std::pair<GLfloat, GLfloat>, GLint>, size_t>(

@@ -88,6 +88,10 @@ namespace CRAFT {
 
 				GLuint m_shader_vertex;
 
+				GLuint m_texture;
+
+				GLint m_texture_uniform;
+
 		} craft_test;
 	}
 }

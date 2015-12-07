@@ -39,6 +39,13 @@ namespace CRAFT {
 
 		#define CRAFT_BLOCK_MAX CRAFT_BLOCK_SNOW
 
+		typedef struct {
+			uint8_t x;
+			uint8_t y;
+			uint8_t z;
+			uint8_t w;
+		} craft_uvec4;
+
 		typedef class _craft_chunk {
 
 			public:
@@ -133,6 +140,10 @@ namespace CRAFT {
 				std::vector<uint8_t> m_height;
 
 				glm::vec2 m_position;
+
+				GLuint m_vertex_buffer;
+
+				GLsizei m_vertex_buffer_length;
 		} craft_chunk;
 	}
 }

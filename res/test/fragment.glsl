@@ -19,11 +19,20 @@
 
 #version 130
 
-in vec3 out_color;
-out vec3 color;
+// TEXTURE
+varying vec2 out_coordinate;
+uniform sampler2D texture;
+
+// COLOR
+//in vec3 out_color;
+//out vec3 color;
 
 void 
 main(void)
 {
-	color = out_color;
+	// TEXTURE
+	gl_FragColor = texture2D(texture, out_coordinate);
+
+	// COLOR
+	//color = out_color;
 }

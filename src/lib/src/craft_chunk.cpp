@@ -47,7 +47,9 @@ namespace CRAFT {
 			__in const glm::vec3 &dimension,
 			__in const std::vector<uint8_t> &height
 			) :
-				m_changed(true)
+				m_changed(true),
+				m_vertex_buffer(0),
+				m_vertex_buffer_length(0)
 		{
 			initialize(position, dimension, height);
 		}
@@ -59,14 +61,20 @@ namespace CRAFT {
 				m_changed(other.m_changed),
 				m_dimension(other.m_dimension),
 				m_height(other.m_height),
-				m_position(other.m_position)
+				m_position(other.m_position),
+				m_vertex_buffer(0),
+				m_vertex_buffer_length(0)
 		{
-			return;
+			glGenBuffers(1, &m_vertex_buffer);
 		}
 
 		_craft_chunk::~_craft_chunk(void)
 		{
-			return;
+
+			if(m_vertex_buffer) {
+				glDeleteBuffers(1, &m_vertex_buffer);
+				m_vertex_buffer = 0;
+			}
 		}
 
 		_craft_chunk &
@@ -246,6 +254,7 @@ namespace CRAFT {
 			m_dimension = dimension;
 			m_height = height;
 			generate_blocks();
+			glGenBuffers(1, &m_vertex_buffer);
 		}
 
 		bool 
@@ -290,10 +299,11 @@ namespace CRAFT {
 		_craft_chunk::render(void)
 		{
 
-			if(m_changed) {
+			if(m_changed && m_vertex_buffer_length) {
 				m_changed = false;
-
-				// TODO: render chunk
+				glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
+				glVertexAttribPointer(0, 4, GL_BYTE, GL_FALSE, 0, NULL);
+				glDrawArrays(GL_TRIANGLES, 0, m_vertex_buffer_length);
 			}
 		}
 
@@ -432,9 +442,19 @@ namespace CRAFT {
 			__in GLfloat delta
 			)
 		{
+			std::vector<craft_uvec4> data;
+
 			// TODO: add chunk logic (falling blocks, etc.)
 
-			m_changed = true;
+			// TODO: add blocks data vector
+
+			m_vertex_buffer_length = data.size();
+			if(m_vertex_buffer_length) {
+				glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
+				glBufferData(GL_ARRAY_BUFFER, data.size() * sizeof(craft_uvec4), (void *) &data[0], 
+					GL_STATIC_DRAW);
+				m_changed = true;
+			}
 		}
 	}
 }

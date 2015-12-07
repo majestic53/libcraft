@@ -20,13 +20,25 @@
 #version 130
 
 in vec3 position;
-in vec3 in_color;
-out vec3 out_color;
+
+// TEXTURE
+in vec2 in_coordinate;
+varying vec2 out_coordinate;
+
+// COLOR
+//in vec3 in_color;
+//out vec3 out_color;
+
 uniform mat4 mvp;
 
 void 
 main(void)
 {	
 	gl_Position =  mvp * vec4(position, 1.f);
-	out_color = in_color;
+	
+	// TEXTURE
+	out_coordinate = in_coordinate;
+
+	// COLOR
+	//out_color = in_color;
 }

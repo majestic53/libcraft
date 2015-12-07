@@ -43,7 +43,7 @@ namespace CRAFT {
 
 			GLuint add_texture(
 				__in const std::string &path,
-				__in_opt GLint filter = GL_LINEAR,
+				__in_opt GLint filter = GL_NEAREST,
 				__in_opt GLint wrap = GL_CLAMP_TO_EDGE
 				);
 
@@ -52,7 +52,7 @@ namespace CRAFT {
 				__in GLfloat width,
 				__in GLfloat height,
 				__in_opt GLint format = GL_RGBA,
-				__in_opt GLint filter = GL_LINEAR,
+				__in_opt GLint filter = GL_NEAREST,
 				__in_opt GLint wrap = GL_CLAMP_TO_EDGE
 				);
 
