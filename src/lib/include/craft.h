@@ -50,6 +50,7 @@ using namespace CRAFT::TEST;
 #include "craft_keyboard.h"
 #include "craft_mouse.h"
 #include "craft_camera.h"
+#include "craft_text.h"
 #include "craft_world.h"
 
 using namespace CRAFT::COMPONENT;

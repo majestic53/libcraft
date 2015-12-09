@@ -30,11 +30,12 @@ archive:
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN)$(LIB) $(DIR_BUILD)craft.o $(DIR_BUILD)craft_camera.o $(DIR_BUILD)craft_chunk.o $(DIR_BUILD)craft_display.o \
 		$(DIR_BUILD)craft_exception.o $(DIR_BUILD)craft_gl.o $(DIR_BUILD)craft_keyboard.o $(DIR_BUILD)craft_mouse.o \
-		$(DIR_BUILD)craft_random.o $(DIR_BUILD)craft_test.o $(DIR_BUILD)craft_world.o
+		$(DIR_BUILD)craft_random.o $(DIR_BUILD)craft_test.o $(DIR_BUILD)craft_text.o $(DIR_BUILD)craft_world.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: craft.o craft_camera.o craft_chunk.o craft_display.o craft_exception.o craft_gl.o craft_keyboard.o craft_mouse.o craft_random.o craft_test.o craft_world.o
+build: craft.o craft_camera.o craft_chunk.o craft_display.o craft_exception.o craft_gl.o craft_keyboard.o craft_mouse.o craft_random.o craft_test.o \
+	craft_text.o craft_world.o
 
 craft.o: $(DIR_SRC)craft.cpp $(DIR_INC)craft.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)craft.cpp -o $(DIR_BUILD)craft.o
@@ -64,6 +65,9 @@ craft_keyboard.o: $(DIR_SRC)craft_keyboard.cpp $(DIR_INC)craft_keyboard.h
 
 craft_mouse.o: $(DIR_SRC)craft_mouse.cpp $(DIR_INC)craft_mouse.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)craft_mouse.cpp -o $(DIR_BUILD)craft_mouse.o
+
+craft_text.o: $(DIR_SRC)craft_text.cpp $(DIR_INC)craft_text.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)craft_text.cpp -o $(DIR_BUILD)craft_text.o
 
 craft_world.o: $(DIR_SRC)craft_world.cpp $(DIR_INC)craft_world.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)craft_world.cpp -o $(DIR_BUILD)craft_world.o

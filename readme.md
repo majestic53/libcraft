@@ -11,6 +11,11 @@ Table of Contents
 
 Changelog
 =========
+##Version 0.1.1550
+*Updated:12/8/2015*
+
+* Added text class (partial)
+
 ##Version 0.1.1549
 *Updated:12/5-6/2015*
 

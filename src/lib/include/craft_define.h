@@ -36,6 +36,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <GLFW/glfw3.h>
 #include <SDL2/SDL.h>
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 namespace CRAFT {
 
@@ -53,7 +55,7 @@ namespace CRAFT {
 		__pragma(pack(push, 1)) typedef struct _STRUCT_ _NAME_ __pragma(pack(pop))
 #endif // _WIN32
 
-	#define BACKGROUND_COLOR glm::vec3{0.192156863, 0.301960784, 0.474509804}
+	#define BACKGROUND_COLOR glm::vec3{0.5, 0.5, 0.5} //glm::vec3{0.192156863, 0.301960784, 0.474509804}
 
 	#define BLOCK_DIRT_LEVEL 96
 	#define BLOCK_GRASS_LEVEL 63
@@ -131,11 +133,11 @@ namespace CRAFT {
 
 	#define VERSION_MAJOR 0
 	#define VERSION_MINOR 1
-	#define VERSION_REVISION 7
+	#define VERSION_REVISION 1
 	#define VERSION_STRING \
 		STRING_CONCAT(VERSION_MAJOR) "." STRING_CONCAT(VERSION_MINOR) \
 		"." STRING_CONCAT(VERSION_TICK) "." STRING_CONCAT(VERSION_REVISION)
-	#define VERSION_TICK 1549
+	#define VERSION_TICK 1550
 
 	#define VERTEX_DATA_LENGTH 18
 
