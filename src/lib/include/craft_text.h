@@ -24,6 +24,8 @@ namespace CRAFT {
 
 	namespace COMPONENT {
 
+		typedef uint32_t craft_font;
+
 		typedef class _craft_text {
 
 			public:
@@ -32,7 +34,38 @@ namespace CRAFT {
 
 				static _craft_text *acquire(void);
 
+				craft_font add_face(
+					__in const std::string &path,
+					__in size_t size
+					);
+
 				void clear(void);
+
+				bool contains_face_reference(
+					__in const craft_font &id
+					);
+
+				size_t decrement_face_reference(
+					__in const craft_font &id
+					);
+
+				size_t face_count(void);
+
+				std::string face_path(
+					__in const craft_font &id
+					);
+
+				size_t face_reference(
+					__in const craft_font &id
+					);
+
+				size_t face_size(
+					__in const craft_font &id
+					);
+
+				size_t increment_face_reference(
+					__in const craft_font &id
+					);
 
 				void initialize(void);
 
@@ -41,6 +74,11 @@ namespace CRAFT {
 				bool is_initialized(void);
 
 				void render(void);
+
+				void set_face_size(
+					__in const craft_font &id,
+					__in size_t size
+					);
 
 				std::string to_string(
 					__in_opt bool verbose = false
@@ -62,12 +100,33 @@ namespace CRAFT {
 
 				static void _delete(void);
 
+				std::map<craft_font, std::pair<std::pair<FT_Face, std::pair<std::string, size_t>>, size_t>>::iterator find_face(
+					__in const craft_font &id
+					);
+
+				FT_GlyphSlot load_glyph(
+					__in const craft_font &id,
+					__in FT_ULong character,
+					__in_opt FT_Int32 flag = FT_LOAD_RENDER
+					);
+
+				craft_font reserve_id(void);
+
+				void retire_id(
+					__in const craft_font &id
+					);
+
+				std::map<craft_font, std::pair<std::pair<FT_Face, std::pair<std::string, size_t>>, size_t>> m_face_map;				
+
 				bool m_initialized;
 
 				static _craft_text *m_instance;
 
 				FT_Library m_library;
 
+				craft_font m_next_id;
+
+				std::set<craft_font> m_surplus_id;
 		} craft_text;
 	}
 }

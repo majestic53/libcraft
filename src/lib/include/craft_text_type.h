@@ -34,7 +34,10 @@ namespace CRAFT {
 		enum {
 			CRAFT_TEXT_EXCEPTION_ALLOCATED = 0,
 			CRAFT_TEXT_EXCEPTION_EXTERNAL,
+			CRAFT_TEXT_EXCEPTION_FACE_NOT_FOUND,
+			CRAFT_TEXT_EXCEPTION_ID_FULL,
 			CRAFT_TEXT_EXCEPTION_INITIALIZED,
+			CRAFT_TEXT_EXCEPTION_INVALID_SIZE,
 			CRAFT_TEXT_EXCEPTION_UNINITIALIZED,
 		};
 
@@ -43,7 +46,10 @@ namespace CRAFT {
 		static const std::string CRAFT_TEXT_EXCEPTION_STR[] = {
 			CRAFT_TEXT_EXCEPTION_HEADER " Failed to allocate text component",
 			CRAFT_TEXT_EXCEPTION_HEADER " External exception",
+			CRAFT_TEXT_EXCEPTION_HEADER " Face does not exist",
+			CRAFT_TEXT_EXCEPTION_HEADER " Font id full",
 			CRAFT_TEXT_EXCEPTION_HEADER " Text component is initialized",
+			CRAFT_TEXT_EXCEPTION_HEADER " Invalid font size",
 			CRAFT_TEXT_EXCEPTION_HEADER " Text component is uninitialized"
 			};
 

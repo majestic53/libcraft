@@ -12,7 +12,7 @@ Table of Contents
 Changelog
 =========
 ##Version 0.1.1550
-*Updated:12/8/2015*
+*Updated:12/8-9/2015*
 
 * Added text class (partial)
 
