@@ -29,7 +29,9 @@ namespace CRAFT {
 		_craft_text::_craft_text(void) :
 			m_initialized(false),
 			m_library(NULL),
-			m_next_id(0)
+			m_next_id(0),
+			m_texture(0),
+			m_vertex_buffer(0)
 		{
 			std::atexit(craft_text::_delete);
 		}
@@ -89,13 +91,13 @@ namespace CRAFT {
 			extern_result = FT_New_Face(m_library, path.c_str(), 0, &face);
 			if(extern_result != FT_Err_Ok) {
 				THROW_CRAFT_TEXT_EXCEPTION_FORMAT(CRAFT_TEXT_EXCEPTION_EXTERNAL,
-					"%s", "FT_New_Face failed: 0x%x", extern_result);
+					"FT_New_Face failed: 0x%x", extern_result);
 			}
 
 			extern_result = FT_Set_Pixel_Sizes(face, 0, size);
 			if(extern_result != FT_Err_Ok) {
 				THROW_CRAFT_TEXT_EXCEPTION_FORMAT(CRAFT_TEXT_EXCEPTION_EXTERNAL,
-					"%s", "FT_Set_Pixel_Sizes failed: 0x%x", extern_result);
+					"FT_Set_Pixel_Sizes failed: 0x%x", extern_result);
 			}
 
 			result = reserve_id();
@@ -110,6 +112,7 @@ namespace CRAFT {
 		void 
 		_craft_text::clear(void)
 		{
+			craft_gl *inst = NULL;
 			FT_Error extern_result;
 			std::map<craft_font, std::pair<std::pair<FT_Face, std::pair<std::string, size_t>>, size_t>>::iterator face_iter;
 
@@ -125,9 +128,27 @@ namespace CRAFT {
 					extern_result = FT_Done_Face(face_iter->second.first.first);
 					if(extern_result != FT_Err_Ok) {
 						THROW_CRAFT_TEXT_EXCEPTION_FORMAT(CRAFT_TEXT_EXCEPTION_EXTERNAL,
-							"%s", "FT_Done_Face failed: 0x%x", extern_result);
+							"FT_Done_Face failed: 0x%x", extern_result);
 					}
 				}
+			}
+
+			inst = craft_gl::acquire();
+
+			if(m_texture) {
+
+				if(inst->contains_texture(m_texture)) {
+					inst->decrement_texture_reference(m_texture);
+				} else {
+					glDeleteTextures(1, &m_texture);
+				}
+
+				m_texture = 0;
+			}
+
+			if(m_vertex_buffer) {
+				glDeleteBuffers(1, &m_vertex_buffer);
+				m_vertex_buffer = 0;
 			}
 
 			m_next_id = 0;
@@ -167,7 +188,7 @@ namespace CRAFT {
 				extern_result = FT_Done_Face(iter->second.first.first);
 				if(extern_result != FT_Err_Ok) {
 					THROW_CRAFT_TEXT_EXCEPTION_FORMAT(CRAFT_TEXT_EXCEPTION_EXTERNAL,
-						"%s", "FT_Done_Face failed: 0x%x", extern_result);
+						"FT_Done_Face failed: 0x%x", extern_result);
 				}
 
 				retire_id(iter->first);
@@ -274,11 +295,15 @@ namespace CRAFT {
 			result = FT_Init_FreeType(&m_library);
 			if(result != FT_Err_Ok) {
 				THROW_CRAFT_TEXT_EXCEPTION_FORMAT(CRAFT_TEXT_EXCEPTION_EXTERNAL,
-					"%s", "FT_Init_FreeType failed: 0x%x", result);
+					"FT_Init_FreeType failed: 0x%x", result);
 			}
 			
+			// TODO: allocate texture using craft_gl
+			// TODO: allocate vertex buffer
+
 			m_initialized = true;
 			clear();
+			setup();
 		}
 
 		bool 
@@ -312,14 +337,16 @@ namespace CRAFT {
 			result = FT_Load_Char(face, character, flag);
 			if(result != FT_Err_Ok) {
 				THROW_CRAFT_TEXT_EXCEPTION_FORMAT(CRAFT_TEXT_EXCEPTION_EXTERNAL,
-					"%s", "FT_Load_Char failed: 0x%x", result);
+					"FT_Load_Char failed: 0x%x", result);
 			}
 
 			return face->glyph;
 		}
 
 		void 
-		_craft_text::render(void)
+		_craft_text::render(
+			__in const glm::mat4 &mvp
+			)
 		{
 
 			if(!m_initialized) {
@@ -389,7 +416,44 @@ namespace CRAFT {
 			extern_result = FT_Set_Pixel_Sizes(iter->second.first.first, 0, size);
 			if(extern_result != FT_Err_Ok) {
 				THROW_CRAFT_TEXT_EXCEPTION_FORMAT(CRAFT_TEXT_EXCEPTION_EXTERNAL,
-					"%s", "FT_Set_Pixel_Sizes failed: 0x%x", extern_result);
+					"FT_Set_Pixel_Sizes failed: 0x%x", extern_result);
+			}
+		}
+
+		void 
+		_craft_text::setup(void)
+		{
+
+			if(!m_initialized) {
+				THROW_CRAFT_TEXT_EXCEPTION(CRAFT_TEXT_EXCEPTION_UNINITIALIZED);
+			}
+
+			// TODO: crete texture/vertex buffer
+		}
+
+		void 
+		_craft_text::teardown(void)
+		{
+			craft_gl *inst = NULL;
+
+			if(!m_initialized) {
+				THROW_CRAFT_TEXT_EXCEPTION(CRAFT_TEXT_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(m_texture) {
+
+				if(inst->contains_texture(m_texture)) {
+					inst->decrement_texture_reference(m_texture);
+				} else {
+					glDeleteTextures(1, &m_texture);
+				}
+
+				m_texture = 0;
+			}
+
+			if(m_vertex_buffer) {
+				glDeleteBuffers(1, &m_vertex_buffer);
+				m_vertex_buffer = 0;
 			}
 		}
 
@@ -442,6 +506,7 @@ namespace CRAFT {
 				THROW_CRAFT_TEXT_EXCEPTION(CRAFT_TEXT_EXCEPTION_UNINITIALIZED);
 			}
 
+			teardown();
 			clear();
 
 			if(m_library) {
@@ -449,7 +514,7 @@ namespace CRAFT {
 				result = FT_Done_FreeType(m_library);
 				if(result != FT_Err_Ok) {
 					THROW_CRAFT_TEXT_EXCEPTION_FORMAT(CRAFT_TEXT_EXCEPTION_EXTERNAL,
-						"%s", "FT_Done_FreeType failed: 0x%x", result);
+						"FT_Done_FreeType failed: 0x%x", result);
 				}
 
 				m_library = NULL;

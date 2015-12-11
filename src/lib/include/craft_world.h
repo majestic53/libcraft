@@ -129,6 +129,8 @@ namespace CRAFT {
 				std::unordered_map<glm::vec2, craft_chunk, craft_position_key, 
 					craft_position_key> m_chunk_map;
 
+				craft_font m_font;
+
 				std::vector<double> m_height_list;
 
 				bool m_initialized;
@@ -144,6 +146,8 @@ namespace CRAFT {
 				craft_random *m_instance_random;
 
 				craft_test *m_instance_test;
+
+				craft_text *m_instance_text;
 
 				glm::mat4 m_mvp;
 

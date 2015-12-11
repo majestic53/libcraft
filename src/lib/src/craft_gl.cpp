@@ -207,6 +207,34 @@ namespace CRAFT {
 
 	GLuint 
 	_craft_gl::add_texture(
+		__in_opt GLint filter,
+		__in_opt GLint wrap
+		)
+	{
+		GLuint result = 0;
+
+		if(!m_initialized) {
+			THROW_CRAFT_GL_EXCEPTION(CRAFT_GL_EXCEPTION_UNINITIALIZED);
+		}
+
+		glActiveTexture(GL_TEXTURE0);
+		glGenTextures(1, &result);
+		glBindTexture(GL_TEXTURE_2D, result);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		m_texture_map.insert(std::pair<GLuint, std::pair<std::pair<std::pair<GLfloat, GLfloat>, GLint>, size_t>>(
+			result, std::pair<std::pair<std::pair<GLfloat, GLfloat>, GLint>, size_t>(
+			std::pair<std::pair<GLfloat, GLfloat>, GLint>(std::pair<GLfloat, GLfloat>(0, 0), 0), 
+			REFERENCE_INITIAL)));
+
+		return result;
+	}
+
+	GLuint 
+	_craft_gl::add_texture(
 		__in const std::string &path,
 		__in_opt GLint filter,
 		__in_opt GLint wrap

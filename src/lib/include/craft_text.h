@@ -73,7 +73,9 @@ namespace CRAFT {
 
 				bool is_initialized(void);
 
-				void render(void);
+				void render(
+					__in const glm::mat4 &mvp
+					);
 
 				void set_face_size(
 					__in const craft_font &id,
@@ -116,6 +118,10 @@ namespace CRAFT {
 					__in const craft_font &id
 					);
 
+				void setup(void);
+
+				void teardown(void);
+
 				std::map<craft_font, std::pair<std::pair<FT_Face, std::pair<std::string, size_t>>, size_t>> m_face_map;				
 
 				bool m_initialized;
@@ -127,6 +133,10 @@ namespace CRAFT {
 				craft_font m_next_id;
 
 				std::set<craft_font> m_surplus_id;
+
+				GLuint m_texture;
+
+				GLuint m_vertex_buffer;
 		} craft_text;
 	}
 }

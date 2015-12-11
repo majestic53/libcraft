@@ -42,6 +42,11 @@ namespace CRAFT {
 				);
 
 			GLuint add_texture(
+				__in_opt GLint filter = GL_LINEAR,
+				__in_opt GLint wrap = GL_CLAMP_TO_EDGE
+				);
+
+			GLuint add_texture(
 				__in const std::string &path,
 				__in_opt GLint filter = GL_NEAREST,
 				__in_opt GLint wrap = GL_CLAMP_TO_EDGE

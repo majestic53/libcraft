@@ -17,7 +17,7 @@
 
 CC=clang++
 CC_FLAGS=-march=native -pthread -std=gnu++11 -O3 -Wall -Werror
-CC_FLAGS_GL=-lGLEW -lGLU -lGL -lglfw -lSDL2 -lSDL2_mixer -lglut
+CC_FLAGS_GL=-lGLEW -lGLU -lGL -lglfw -lSDL2 -lSDL2_mixer -lglut -lfreetype
 DIR_BIN=./../../bin/
 DIR_BUILD=./../../build/
 DIR_INC=./include/

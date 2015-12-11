@@ -20,6 +20,9 @@
 #include "../include/craft.h"
 #include "../include/craft_world_type.h"
 
+#define FONT_PATH "./res/test/FreeSans.ttf"
+#define FONT_SIZE 48
+
 namespace CRAFT {
 
 	namespace COMPONENT {
@@ -50,12 +53,14 @@ namespace CRAFT {
 		_craft_world *_craft_world::m_instance = NULL;
 
 		_craft_world::_craft_world(void) :
+			m_font(0),
 			m_initialized(false),
 			m_instance_camera(craft_camera::acquire()),
 			m_instance_keyboard(craft_keyboard::acquire()),
 			m_instance_mouse(craft_mouse::acquire()),
 			m_instance_random(craft_random::acquire()),
 			m_instance_test(craft_test::acquire()),
+			m_instance_text(craft_text::acquire()),
 			m_window(NULL)
 		{
 			std::atexit(craft_world::_delete);
@@ -102,9 +107,11 @@ namespace CRAFT {
 				THROW_CRAFT_WORLD_EXCEPTION(CRAFT_WORLD_EXCEPTION_UNINITIALIZED);
 			}
 
+			m_font = 0;
 			m_instance_camera->clear();
 			m_instance_keyboard->clear();
 			m_instance_mouse->clear();
+			m_instance_text->clear();
 			m_height_list.clear();
 			m_chunk_map.clear();
 			m_window = NULL;
@@ -219,6 +226,7 @@ namespace CRAFT {
 
 			// TODO: render world
 			m_instance_test->render(m_mvp);
+			m_instance_text->render(m_mvp);
 			// ---
 
 			glFlush();
@@ -266,13 +274,17 @@ namespace CRAFT {
 					"%lu (must be divisible by %lu)", dimension, CHUNK_WIDTH);
 			}
 
+			m_font = 0;
 			m_instance_random->initialize(seed);
 			SDL_GetWindowSize(m_window, &width, &height);
 			m_instance_keyboard->initialize(KEY_SET);
 			m_instance_mouse->initialize(m_window, true);
 			m_instance_camera->initialize({width, height});
 			m_instance_test->initialize();
+			m_instance_text->initialize();
 			reset();
+
+			m_instance_text->add_face(FONT_PATH, FONT_SIZE);
 
 			// TODO: DEBUG
 			std::stringstream path;
@@ -341,6 +353,7 @@ namespace CRAFT {
 			}
 
 			clear();
+			m_instance_text->uninitialize();
 			m_instance_test->uninitialize();
 			m_instance_camera->uninitialize();
 			m_instance_mouse->uninitialize();
